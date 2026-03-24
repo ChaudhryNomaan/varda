@@ -40,7 +40,6 @@ export default function AdminCollections() {
     }));
   };
 
-  // ADVANCED SYNC WITH VERIFICATION
   const confirmAndSaveAll = async () => {
     const changeEntries = Object.entries(pendingChanges);
     if (changeEntries.length === 0) return;
@@ -48,25 +47,21 @@ export default function AdminCollections() {
     setIsSaving(true);
     try {
       for (const [id, payload] of changeEntries) {
-        // 1. Strip system fields (id and created_at) to avoid Supabase rejection
         const { id: _id, created_at: _ca, ...cleanUpdate } = payload;
 
-        // 2. Perform Update and request back the modified row for verification
         const { data, error } = await supabase
           .from('collections')
           .update(cleanUpdate)
           .eq('id', id)
-          .select(); // This verifies the database actually changed
+          .select();
 
         if (error) throw error;
 
-        // 3. Check if any row was actually modified
         if (!data || data.length === 0) {
           throw new Error(`Database rejected the update for ID: ${id}. This is usually an RLS policy issue.`);
         }
       }
 
-      // 4. Update local state only after DB confirmation
       setCollections(prev => prev.map(col => {
         if (pendingChanges[col.id]) {
           return { ...col, ...pendingChanges[col.id] };
@@ -87,7 +82,13 @@ export default function AdminCollections() {
   const addNewCollection = async () => {
     const { data, error } = await supabase
       .from('collections')
-      .insert([{ title: 'New Collection', subtitle: 'Sub-text', href: '/collections/new', image: '' }])
+      .insert([{ 
+        title: 'New Collection', 
+        subtitle: 'Sub-text', 
+        href: '/category/atelier', // Updated default path
+        subcategory: 'Все',         // Added default subcategory
+        image: '' 
+      }])
       .select();
 
     if (!error && data) {
@@ -182,20 +183,34 @@ export default function AdminCollections() {
                       className="bg-transparent border-b border-gold/10 w-full text-xl font-serif italic text-gold py-1 focus:border-gold outline-none transition-colors" 
                   />
                 </div>
+
+                {/* Added Subcategory field to manage the filters */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[8px] uppercase tracking-widest text-gold/40 block mb-2 font-sans">Subcategory</label>
+                    <input 
+                        value={displayData.subcategory || ''} 
+                        placeholder="e.g. корсеты"
+                        onChange={(e) => trackChange(col.id, 'subcategory', e.target.value)} 
+                        className="bg-transparent border-b border-gold/10 w-full text-[10px] text-bone py-1 focus:border-gold outline-none transition-colors font-sans" 
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[8px] uppercase tracking-widest text-gold/40 block mb-2 font-sans">Href Path</label>
+                    <input 
+                        value={displayData.href} 
+                        onChange={(e) => trackChange(col.id, 'href', e.target.value)} 
+                        className="bg-transparent border-b border-gold/10 w-full text-[11px] font-mono text-bone/40 py-1 focus:border-gold outline-none transition-colors" 
+                    />
+                  </div>
+                </div>
+
                 <div>
                   <label className="text-[8px] uppercase tracking-widest text-gold/40 block mb-2 font-sans">Subtitle</label>
                   <input 
                       value={displayData.subtitle} 
                       onChange={(e) => trackChange(col.id, 'subtitle', e.target.value)} 
                       className="bg-transparent border-b border-gold/10 w-full text-[10px] uppercase tracking-[0.3em] text-bone/60 py-1 focus:border-gold outline-none transition-colors font-sans" 
-                  />
-                </div>
-                <div>
-                  <label className="text-[8px] uppercase tracking-widest text-gold/40 block mb-2 font-sans">Href Path</label>
-                  <input 
-                      value={displayData.href} 
-                      onChange={(e) => trackChange(col.id, 'href', e.target.value)} 
-                      className="bg-transparent border-b border-gold/10 w-full text-[11px] font-mono text-bone/40 py-1 focus:border-gold outline-none transition-colors" 
                   />
                 </div>
               </div>
