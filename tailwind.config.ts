@@ -7,18 +7,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Luxury Brand Palette
-        charcoal: "#1A1A1B", // Deep, soft black for Atelier sections
-        gold: "#C5A059",     // Rich gold for accents and hovers
-        bone: "#FAF9F6",     // Soft off-white for sections/backgrounds
-        espresso: "#2D2926", // Main text color (softer than pure black)
-        taupe: "#8C8179",    // Muted secondary text/border color
-        alabaster: "#F3F3F3", // Very light grey for product cards
-        burgundy: "#4A0E0E",  // Deep red for sale/exclusive badges
+        charcoal: "#1A1A1B",
+        gold: "#C5A059",
+        bone: "#FAF9F6",
+        espresso: "#2D2926",
+        taupe: "#8C8179",
+        alabaster: "#F3F3F3",
+        burgundy: "#4A0E0E",
       },
       fontFamily: {
-        // Use these if you want to explicitly separate Serif and Sans in CSS
-        serif: ["var(--font-inter)", "serif"], // Or your specific serif font
+        serif: ["var(--font-inter)", "serif"],
       },
       letterSpacing: {
         "widest-plus": ".3em",
@@ -26,10 +24,18 @@ export default {
       },
       animation: {
         "slide-down": "slide-down 2s cubic-bezier(0.4, 0, 0.2, 1) infinite",
+        // ADDED: The hero line animation
+        "hero-line": "hero-line 3s cubic-bezier(0.7, 0, 0.3, 1) infinite",
       },
       keyframes: {
         "slide-down": {
           "0%": { transform: "translateY(-100%)" },
+          "100%": { transform: "translateY(100%)" },
+        },
+        // ADDED: The hero line keyframes
+        "hero-line": {
+          "0%": { transform: "translateY(-100%)" },
+          "50%": { transform: "translateY(0)" },
           "100%": { transform: "translateY(100%)" },
         },
       },

@@ -16,12 +16,10 @@ interface HeroProps {
 export const Hero = ({ data }: HeroProps) => {
   const [mounted, setMounted] = useState(false);
 
-  // Prevents hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Default values used if Supabase is empty
   const defaults = {
     subtitle: "Digital Archive",
     titleMain: "AETHER",
@@ -33,7 +31,6 @@ export const Hero = ({ data }: HeroProps) => {
 
   const content = data || defaults;
 
-  // Render a clean skeleton background during hydration
   if (!mounted) {
     return (
       <section className="h-screen w-full bg-[#0F0F0F] flex items-center justify-center">
@@ -51,10 +48,9 @@ export const Hero = ({ data }: HeroProps) => {
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-black/30 z-10" />
         
-        {/* Only render video if the URL is not empty */}
         {content.videoUrl ? (
           <video
-            key={content.videoUrl} // Forces re-render when admin updates the link
+            key={content.videoUrl}
             autoPlay
             loop
             muted
@@ -62,7 +58,6 @@ export const Hero = ({ data }: HeroProps) => {
             className="w-full h-full object-cover scale-105"
           >
             <source src={content.videoUrl} type="video/mp4" />
-            {/* Fallback image inside video tag only if URL exists */}
             {content.fallbackImageUrl && (
               <img 
                 src={content.fallbackImageUrl} 
@@ -72,14 +67,12 @@ export const Hero = ({ data }: HeroProps) => {
             )}
           </video>
         ) : content.fallbackImageUrl ? (
-          // Show fallback image if no video is provided
           <img 
             src={content.fallbackImageUrl} 
             className="w-full h-full object-cover" 
             alt={content.titleMain} 
           />
         ) : (
-          // Solid background if both are empty
           <div className="w-full h-full bg-[#0F0F0F]" />
         )}
       </div>
@@ -112,22 +105,12 @@ export const Hero = ({ data }: HeroProps) => {
 
       {/* Elegant Scroll Indicator */}
       <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-4 opacity-40">
-        <span className="text-[8px] uppercase tracking-[0.6em] text-white">Discover</span>
+        <span className="text-[8px] uppercase tracking-[0.6em] text-white font-sans">Discover</span>
         <div className="w-[1px] h-16 bg-white/10 relative overflow-hidden">
+          {/* This now uses the animation defined in tailwind.config.ts */}
           <div className="absolute top-0 left-0 w-full h-full bg-white animate-hero-line" />
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes hero-line {
-          0% { transform: translateY(-100%); }
-          50% { transform: translateY(0); }
-          100% { transform: translateY(100%); }
-        }
-        .animate-hero-line {
-          animation: hero-line 3s cubic-bezier(0.7, 0, 0.3, 1) infinite;
-        }
-      `}</style>
     </section>
   );
 };
