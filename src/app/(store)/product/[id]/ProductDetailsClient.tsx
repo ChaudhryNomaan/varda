@@ -1,11 +1,16 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function ProductDetailsClient({ product }: { product: any }) {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [activeAssetIndex, setActiveAssetIndex] = useState(0);
+  const [mounted, setMounted] = useState(false);
 
-  // We use the 'product' prop directly now
+  // 1. Hydration Guard: Ensures the client and server match before rendering
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const activeAsset = product.images?.[activeAssetIndex];
   
   const isVideo = (url: string) => {
@@ -13,8 +18,13 @@ export default function ProductDetailsClient({ product }: { product: any }) {
     return url.match(/\.(mp4|webm|ogg|mov|quicktime)/i);
   };
 
+  // 2. Prevent the 'removeChild' crash by returning a skeleton or null until mounted
+  if (!mounted) {
+    return <div className="bg-bone min-h-screen pt-40" />;
+  }
+
   return (
-    <div className="bg-bone min-h-screen pt-40 pb-20">
+    <div className="bg-bone min-h-screen pt-40 pb-20 animate-in fade-in duration-700">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 lg:gap-24">
           
