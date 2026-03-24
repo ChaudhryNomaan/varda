@@ -8,10 +8,14 @@ const supabase = createClient();
 export default function CollectionsPage() {
   const [collections, setCollections] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true); // New: Track if it's the very first visit
 
   useEffect(() => {
     async function fetchCollections() {
       try {
+        // Only trigger the "AETHER" loading screen if we have no data yet
+        if (collections.length === 0) setLoading(true);
+
         const { data, error } = await supabase
           .from('collections')
           .select('*')
@@ -24,16 +28,17 @@ export default function CollectionsPage() {
         console.error("Fetch failed:", err);
       } finally {
         setLoading(false);
+        setIsInitialLoad(false); // Archive is now synced
       }
     }
 
     fetchCollections();
   }, []); 
 
-  // Robust helper with null check to match Admin
   const isVideo = (url: string) => url && /\.(mp4|webm|ogg|mov)$/i.test(url);
 
-  if (loading) return (
+  // Only show the animated loader if it's truly the FIRST load
+  if (loading && isInitialLoad) return (
     <div className="bg-bone min-h-screen flex items-center justify-center">
       <span className="text-[10px] uppercase tracking-[0.5em] text-taupe animate-pulse font-serif">AETHER</span>
     </div>
