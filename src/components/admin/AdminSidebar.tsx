@@ -21,6 +21,12 @@ const SECTIONS = [
     ]
   },
   {
+    title: 'Уведомления',
+    links: [
+      { name: 'Настройка заказов', href: '/admin/products/contact' },
+    ]
+  },
+  {
     title: 'Информация',
     links: [
       { name: 'Возврат и Обмен', href: '/admin/settings/returns' },
