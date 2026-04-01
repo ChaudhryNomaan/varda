@@ -2,9 +2,15 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { createClient } from '../../lib/supabase/client'; // Adjust path if your client is elsewhere
+import { createClient } from '../../lib/supabase/client';
 
 const SECTIONS = [
+  {
+    title: 'Аналитика', // New Section for tracking sales
+    links: [
+      { name: 'Продажи и Выручка', href: '/admin/sales' },
+    ]
+  },
   {
     title: 'Магазин',
     links: [
@@ -47,22 +53,18 @@ export const AdminSidebar = () => {
     setIsMounted(true);
   }, []);
 
-  // Sync closure on route change
   useEffect(() => {
     setIsOpen(false);
   }, [pathname]);
 
   const isActive = (path: string) => pathname === path;
 
-  // New Logout Logic
   const handleLogout = async () => {
     await supabase.auth.signOut();
     router.push('/');
     router.refresh();
   };
 
-  // IMPORTANT: Return a placeholder with the same dimensions during SSR 
-  // to prevent the "removeChild" layout shift error.
   if (!isMounted) {
     return <aside className="hidden lg:flex w-64 bg-[#0A0A0A] h-screen border-r border-gold/10 p-8" />;
   }
@@ -81,7 +83,7 @@ export const AdminSidebar = () => {
         </button>
       </div>
 
-      {/* BACKDROP - Wrapped in a check to prevent DOM mismatch */}
+      {/* BACKDROP */}
       {isOpen && (
         <div 
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[115] lg:hidden"
@@ -133,7 +135,6 @@ export const AdminSidebar = () => {
             </svg>
           </Link>
 
-          {/* New Logout Button */}
           <button 
             onClick={handleLogout}
             className="text-[9px] uppercase tracking-[0.2em] text-red-900/40 hover:text-red-500 transition-all duration-500 text-left border-t border-white/5 pt-4 w-full"
