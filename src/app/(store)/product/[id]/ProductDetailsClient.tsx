@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { createClient } from '../../../../lib/supabase/client';
 import { useCart } from '../../../../context/CartContext';
 
@@ -30,6 +30,14 @@ export default function ProductDetailsClient({ product }: { product: any }) {
     return url.match(/\.(mp4|webm|ogg|mov|quicktime)/i);
   };
 
+  // Calculate discount percentage for the UI
+  const discountPercent = useMemo(() => {
+    if (product.is_on_sale && product.old_price && product.price) {
+      return Math.round(((product.old_price - product.price) / product.old_price) * 100);
+    }
+    return null;
+  }, [product]);
+
   const handleBuyNow = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     
@@ -46,7 +54,7 @@ export default function ProductDetailsClient({ product }: { product: any }) {
         .insert([{
           customer_name: formData.name || "Web Customer",
           customer_email: formData.email || "pending@aether.store",
-          total_amount: product.price,
+          total_amount: product.price, // Uses discounted price if on sale
           status: 'completed',
           payment_method: 'Direct Inquiry',
           items: [{
@@ -76,7 +84,7 @@ export default function ProductDetailsClient({ product }: { product: any }) {
         `✨ NEW ORDER INQUIRY ✨\n\n` +
         `Product: ${product.name}\n` +
         `Size: ${selectedSize}\n` +
-        `Price: ${product.price?.toLocaleString()} ₽\n` +
+        `Price: ${product.price?.toLocaleString()} ₽${product.is_on_sale ? ' (SALE)' : ''}\n` +
         `Customer: ${formData.name || 'Inquiry'}\n` +
         `Phone: ${formData.phone || 'Not provided'}\n` +
         `Address: ${formData.address || 'Not provided'}\n\n` +
@@ -116,6 +124,11 @@ export default function ProductDetailsClient({ product }: { product: any }) {
           
           <div className="space-y-6">
             <div className="relative aspect-[3/4] bg-white/[0.03] overflow-hidden border border-taupe/10 shadow-2xl">
+              {product.is_on_sale && (
+                <div className="absolute top-6 left-6 z-10 bg-gold text-black text-[10px] font-bold px-4 py-1 tracking-[0.2em] shadow-lg">
+                  SALE {discountPercent}%
+                </div>
+              )}
               {isVideo(activeAsset) ? (
                 <video key={`v-${activeAssetIndex}`} src={activeAsset} className="w-full h-full object-cover" autoPlay muted loop playsInline />
               ) : (
@@ -138,7 +151,17 @@ export default function ProductDetailsClient({ product }: { product: any }) {
             <div className="space-y-4">
               <span className="text-[10px] uppercase tracking-[0.5em] text-gold font-sans font-bold">{product.category} Collection</span>
               <h1 className="text-5xl md:text-6xl font-serif italic text-espresso tracking-tight">{product.name}</h1>
-              <p className="text-2xl text-espresso/80 font-serif italic">{product.price?.toLocaleString()} ₽</p>
+              
+              <div className="flex flex-col">
+                {product.is_on_sale && product.old_price && (
+                  <span className="text-sm text-taupe/50 line-through decoration-gold/30 font-sans tracking-widest mb-1">
+                    {product.old_price?.toLocaleString()} ₽
+                  </span>
+                )}
+                <p className={`text-2xl font-serif italic ${product.is_on_sale ? 'text-gold' : 'text-espresso/80'}`}>
+                  {product.price?.toLocaleString()} ₽
+                </p>
+              </div>
             </div>
 
             <p className="text-[14px] leading-relaxed text-taupe/90 max-w-md font-light">{product.description}</p>
@@ -155,7 +178,6 @@ export default function ProductDetailsClient({ product }: { product: any }) {
             </div>
 
             <div className="pt-6">
-              {/* Only Buy Now button remains */}
               <button 
                 onClick={() => selectedSize ? setShowCheckout(true) : alert("Please select a size first.")} 
                 disabled={isRedirecting} 
@@ -181,12 +203,12 @@ export default function ProductDetailsClient({ product }: { product: any }) {
               <form onSubmit={handleBuyNow} className="space-y-6">
                 <div className="space-y-1 border-b border-taupe/20 pb-2">
                   <label className="text-[9px] uppercase tracking-widest text-taupe">Full Name</label>
-                  <input required className="w-full bg-transparent outline-none text-espresso font-serif italic" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="Elizabeth Bennet" />
+                  <input required className="w-full bg-transparent outline-none text-espresso font-serif italic" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="Full Name" />
                 </div>
                 
                 <div className="space-y-1 border-b border-taupe/20 pb-2">
                   <label className="text-[9px] uppercase tracking-widest text-taupe">Email Address</label>
-                  <input type="email" required className="w-full bg-transparent outline-none text-espresso text-sm" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="elizabeth@example.com" />
+                  <input type="email" required className="w-full bg-transparent outline-none text-espresso text-sm" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="email@example.com" />
                 </div>
 
                 <div className="space-y-1 border-b border-taupe/20 pb-2">
@@ -205,7 +227,7 @@ export default function ProductDetailsClient({ product }: { product: any }) {
                     disabled={isRedirecting}
                     className="w-full bg-espresso text-bone py-6 text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-gold hover:text-espresso transition-all active:scale-95 disabled:opacity-50"
                   >
-                    {isRedirecting ? "Syncing with Ledger..." : "Confirm & Open Inquiry"}
+                    {isRedirecting ? "Syncing with Ledger..." : `Confirm Order — ${product.price?.toLocaleString()} ₽`}
                   </button>
                 </div>
               </form>

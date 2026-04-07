@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { createClient } from '../../../../../lib/supabase/client';
 import { useRouter } from 'next/navigation';
 
@@ -20,15 +20,29 @@ export default function NewProductPage() {
   const [category, setCategory] = useState<keyof typeof CATEGORY_MAP>("silk");
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   
-  // Multi-asset state
+  // Sale States
+  const [isOnSale, setIsOnSale] = useState(false);
+  const [currentPrice, setCurrentPrice] = useState("");
+  const [originalPrice, setOriginalPrice] = useState("");
+
   const [assetFiles, setAssetFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<{ url: string; type: string }[]>([]);
+
+  // Calculate Discount Percentage for visual feedback
+  const discountLabel = useMemo(() => {
+    const cur = parseFloat(currentPrice);
+    const old = parseFloat(originalPrice);
+    if (isOnSale && cur && old && old > cur) {
+      const pct = Math.round(((old - cur) / old) * 100);
+      return `-${pct}% Discount`;
+    }
+    return null;
+  }, [currentPrice, originalPrice, isOnSale]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length > 0) {
       setAssetFiles(prev => [...prev, ...files]);
-      
       const newPreviews = files.map(file => ({
         url: URL.createObjectURL(file),
         type: file.type
@@ -57,33 +71,25 @@ export default function NewProductPage() {
       const uploadedUrls: string[] = [];
       const bucketName = 'products'; 
 
-      // 1. MULTI-ASSET UPLOAD
       for (const file of assetFiles) {
         const fileExt = file.name.split('.').pop();
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        
-        const { error: uploadError } = await supabase.storage
-          .from(bucketName)
-          .upload(fileName, file);
-
+        const { error: uploadError } = await supabase.storage.from(bucketName).upload(fileName, file);
         if (uploadError) throw new Error(`Upload failed for ${file.name}: ${uploadError.message}`);
-        
-        const { data: urlData } = supabase.storage
-          .from(bucketName)
-          .getPublicUrl(fileName);
-        
+        const { data: urlData } = supabase.storage.from(bucketName).getPublicUrl(fileName);
         uploadedUrls.push(urlData.publicUrl);
       }
 
-      // 2. Insert into Database
       const { error: dbError } = await supabase.from('products').insert([{
         name: formData.get('name'),
-        price: parseFloat(formData.get('price') as string),
+        price: parseFloat(currentPrice),
+        old_price: isOnSale ? parseFloat(originalPrice) : null,
+        is_on_sale: isOnSale,
         description: formData.get('description'),
         category: category,
         subcategory: formData.get('subcategory'),
         sizes: selectedSizes,
-        images: uploadedUrls, // Array of URLs
+        images: uploadedUrls,
         stock: 1
       }]);
 
@@ -109,7 +115,6 @@ export default function NewProductPage() {
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-12 bg-white/5 p-10 border border-gold/10">
         <div className="space-y-6">
-          {/* Category, Name, Price, Description fields remain the same */}
           <div className="flex flex-col space-y-2">
             <label className="text-[9px] uppercase tracking-[0.3em] text-gold/60">Основная Коллекция</label>
             <select value={category} onChange={(e) => setCategory(e.target.value as any)} className="bg-charcoal border border-gold/20 p-3 text-bone text-xs focus:outline-none focus:border-gold appearance-none">
@@ -131,9 +136,33 @@ export default function NewProductPage() {
             <input required name="name" type="text" placeholder="AETHER Piece Name" className="bg-charcoal border border-gold/20 p-3 text-bone text-xs focus:outline-none focus:border-gold" />
           </div>
 
-          <div className="flex flex-col space-y-2">
-            <label className="text-[9px] uppercase tracking-[0.3em] text-gold/60">Цена (₽)</label>
-            <input required name="price" type="number" placeholder="0.00" className="bg-charcoal border border-gold/20 p-3 text-bone text-xs focus:outline-none focus:border-gold" />
+          {/* PRICING SECTION */}
+          <div className="pt-4 border-t border-gold/5 space-y-4">
+             <div className="flex items-center gap-3 mb-2">
+                <input 
+                  type="checkbox" 
+                  id="saleToggle" 
+                  checked={isOnSale} 
+                  onChange={(e) => setIsOnSale(e.target.checked)}
+                  className="w-3 h-3 accent-gold bg-charcoal border-gold/20"
+                />
+                <label htmlFor="saleToggle" className="text-[9px] uppercase tracking-[0.3em] text-gold cursor-pointer">Активировать скидку</label>
+             </div>
+
+             <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col space-y-2">
+                  <label className="text-[9px] uppercase tracking-[0.3em] text-gold/60">{isOnSale ? "Цена со скидкой" : "Цена (₽)"}</label>
+                  <input required value={currentPrice} onChange={(e) => setCurrentPrice(e.target.value)} type="number" placeholder="0" className="bg-charcoal border border-gold/20 p-3 text-bone text-xs focus:outline-none focus:border-gold" />
+                </div>
+                
+                {isOnSale && (
+                  <div className="flex flex-col space-y-2 animate-in fade-in slide-in-from-left-2">
+                    <label className="text-[9px] uppercase tracking-[0.3em] text-taupe">Старая цена</label>
+                    <input required value={originalPrice} onChange={(e) => setOriginalPrice(e.target.value)} type="number" placeholder="0" className="bg-charcoal border border-gold/20 p-3 text-bone/40 text-xs focus:outline-none focus:border-gold line-through" />
+                  </div>
+                )}
+             </div>
+             {discountLabel && <p className="text-[9px] text-gold italic tracking-widest">{discountLabel}</p>}
           </div>
 
           <div className="flex flex-col space-y-2">
@@ -156,8 +185,6 @@ export default function NewProductPage() {
 
           <div className="space-y-4">
             <label className="text-[9px] uppercase tracking-[0.3em] text-gold/60 block">Медиа-активы (Фото/Видео)</label>
-            
-            {/* Asset Gallery */}
             <div className="grid grid-cols-2 gap-2 mb-4">
               {previews.map((preview, index) => (
                 <div key={index} className="aspect-[3/4] relative bg-charcoal border border-gold/10 group">
@@ -166,34 +193,15 @@ export default function NewProductPage() {
                   ) : (
                     <img src={preview.url} alt="Preview" className="w-full h-full object-cover" />
                   )}
-                  <button 
-                    type="button" 
-                    onClick={() => removeAsset(index)}
-                    className="absolute top-1 right-1 bg-black/50 text-white w-5 h-5 text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    ✕
-                  </button>
+                  <button type="button" onClick={() => removeAsset(index)} className="absolute top-1 right-1 bg-black/50 text-white w-5 h-5 text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
                 </div>
               ))}
-              
-              {/* Add More Button */}
-              <div 
-                onClick={() => fileInputRef.current?.click()}
-                className="aspect-[3/4] bg-charcoal border-2 border-dashed border-gold/20 flex flex-col items-center justify-center cursor-pointer hover:border-gold/40 transition-all group"
-              >
+              <div onClick={() => fileInputRef.current?.click()} className="aspect-[3/4] bg-charcoal border-2 border-dashed border-gold/20 flex flex-col items-center justify-center cursor-pointer hover:border-gold/40 transition-all group">
                 <span className="text-2xl text-gold/20 font-light">+</span>
                 <p className="text-[8px] uppercase tracking-widest text-bone/40 group-hover:text-gold">Add Media</p>
               </div>
             </div>
-            
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleFileChange} 
-              className="hidden" 
-              accept="image/*,video/*" 
-              multiple 
-            />
+            <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*,video/*" multiple />
           </div>
         </div>
 
@@ -202,8 +210,8 @@ export default function NewProductPage() {
             <h3 className="text-[10px] uppercase tracking-[0.4em] text-gold">Archive Standards</h3>
             <ul className="text-[10px] text-bone/60 space-y-4 leading-relaxed">
               <li className="flex gap-3"><span className="text-gold">•</span><span>Multiple assets allowed.</span></li>
-              <li className="flex gap-3"><span className="text-gold">•</span><span>Videos supported (MP4/MOV).</span></li>
-              <li className="flex gap-3"><span className="text-gold">•</span><span>First asset will be the cover.</span></li>
+              <li className="flex gap-3"><span className="text-gold">•</span><span>First asset is the cover.</span></li>
+              {isOnSale && <li className="flex gap-3"><span className="text-gold">•</span><span className="text-gold font-bold">Sale badge will be displayed.</span></li>}
             </ul>
           </div>
 

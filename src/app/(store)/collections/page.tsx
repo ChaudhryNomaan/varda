@@ -1,13 +1,25 @@
 import { createClient } from '../../../lib/supabase/server';
-import CollectionsClient from '././CollectionsClient'; // This must match the filename above
+import CollectionsClient from './CollectionsClient';
+
+// Ensure editorial changes to collections are reflected instantly
+export const revalidate = 0;
 
 export default async function CollectionsPage() {
   const supabase = await createClient();
 
-  const { data: initialCollections } = await supabase
+  // Fetching the editorial collections for the main showcase
+  const { data: initialCollections, error } = await supabase
     .from('collections')
     .select('*')
     .order('created_at', { ascending: true });
 
-  return <CollectionsClient initialCollections={initialCollections || []} />;
+  if (error) {
+    console.error("Collections fetch error:", error);
+  }
+
+  return (
+    <CollectionsClient 
+      initialCollections={initialCollections || []} 
+    />
+  );
 }

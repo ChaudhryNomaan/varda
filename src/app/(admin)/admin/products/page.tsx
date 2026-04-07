@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../../../lib/supabase/client';
 
-// Standardized mapping to match Edit Page logic
 const CATEGORY_MAP: Record<string, string[]> = {
   silk: ["Все", "Бюстгальтеры", "Трусики", "Комплекты", "Ночные сорочки"],
   lingerie: ["Все", "Бюстгальтеры", "Трусики", "Пары", "Боди"],
@@ -40,10 +39,8 @@ export default function InventoryPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Remove this piece from the digital archive permanently?")) return;
-    
     const { error } = await supabase.from('products').delete().eq('id', id);
     if (!error) {
-      // Optimistic update for immediate UI feedback
       setProducts(prev => prev.filter(p => p.id !== id));
       router.refresh();
     } else {
@@ -58,7 +55,6 @@ export default function InventoryPage() {
     return categoryMatch && subMatch && searchMatch;
   });
 
-  // Prevent Hydration Errors
   if (!isMounted) return null;
 
   return (
@@ -144,36 +140,55 @@ export default function InventoryPage() {
                 <tr><td colSpan={5} className="p-32 text-center text-gold animate-pulse tracking-[0.5em] font-sans text-[10px]">Synchronizing Archive...</td></tr>
               ) : filteredProducts.length === 0 ? (
                 <tr><td colSpan={5} className="p-32 text-center text-bone/20 italic tracking-widest font-sans uppercase">No pieces found in this sector.</td></tr>
-              ) : filteredProducts.map((product) => (
-                <tr key={product.id} className="hover:bg-white/[0.03] transition-colors group">
-                  <td className="p-6">
-                    <div className="w-14 h-20 bg-black border border-gold/10 overflow-hidden relative group-hover:border-gold/40 transition-all duration-500">
-                      <img 
-                        src={product.images?.[0] || 'https://via.placeholder.com/300x400?text=Empty'} 
-                        alt="" 
-                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" 
-                      />
-                    </div>
-                  </td>
-                  <td className="p-6">
-                    <span className="text-bone tracking-widest group-hover:text-gold transition-colors block font-serif italic text-lg">{product.name}</span>
-                    <span className="text-[8px] text-bone/20 mt-1 block tracking-tighter">REF: {product.id.substring(0,8)}</span>
-                  </td>
-                  <td className="p-6">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-gold/80 font-bold text-[9px]">{product.category}</span>
-                      <span className="text-[9px] text-bone/40 lowercase italic font-serif tracking-normal">{product.subcategory}</span>
-                    </div>
-                  </td>
-                  <td className="p-6 text-bone text-right font-light tracking-widest">{product.price.toLocaleString()} ₽</td>
-                  <td className="p-6 text-right">
-                    <div className="flex justify-end gap-6">
-                      <Link href={`/admin/products/edit/${product.id}`} className="text-bone/40 hover:text-gold transition-colors text-[9px] font-bold">EDIT</Link>
-                      <button onClick={() => handleDelete(product.id)} className="text-bone/20 hover:text-red-500 transition-colors text-[9px] font-bold">DELETE</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              ) : filteredProducts.map((product) => {
+                const discount = product.is_on_sale && product.old_price 
+                  ? Math.round(((product.old_price - product.price) / product.old_price) * 100) 
+                  : 0;
+
+                return (
+                  <tr key={product.id} className="hover:bg-white/[0.03] transition-colors group">
+                    <td className="p-6">
+                      <div className="w-14 h-20 bg-black border border-gold/10 overflow-hidden relative group-hover:border-gold/40 transition-all duration-500">
+                        <img 
+                          src={product.images?.[0] || 'https://via.placeholder.com/300x400'} 
+                          alt="" 
+                          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" 
+                        />
+                        {product.is_on_sale && (
+                          <div className="absolute top-0 left-0 bg-gold text-black text-[7px] font-bold px-1.5 py-0.5">SALE</div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="p-6">
+                      <span className="text-bone tracking-widest group-hover:text-gold transition-colors block font-serif italic text-lg">{product.name}</span>
+                      <span className="text-[8px] text-bone/20 mt-1 block tracking-tighter">REF: {product.id.substring(0,8)}</span>
+                    </td>
+                    <td className="p-6">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-gold/80 font-bold text-[9px]">{product.category}</span>
+                        <span className="text-[9px] text-bone/40 lowercase italic font-serif tracking-normal">{product.subcategory}</span>
+                      </div>
+                    </td>
+                    <td className="p-6 text-right font-sans">
+                      {product.is_on_sale ? (
+                        <div className="flex flex-col items-end">
+                          <span className="text-bone/30 text-[9px] line-through decoration-gold/40">{product.old_price.toLocaleString()} ₽</span>
+                          <span className="text-gold font-bold tracking-widest">{product.price.toLocaleString()} ₽</span>
+                          <span className="text-[8px] text-gold/60 mt-1">-{discount}%</span>
+                        </div>
+                      ) : (
+                        <span className="text-bone font-light tracking-widest">{product.price.toLocaleString()} ₽</span>
+                      )}
+                    </td>
+                    <td className="p-6 text-right">
+                      <div className="flex justify-end gap-6">
+                        <Link href={`/admin/products/edit/${product.id}`} className="text-bone/40 hover:text-gold transition-colors text-[9px] font-bold">EDIT</Link>
+                        <button onClick={() => handleDelete(product.id)} className="text-bone/20 hover:text-red-500 transition-colors text-[9px] font-bold">DELETE</button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -186,13 +201,19 @@ export default function InventoryPage() {
             <div className="p-20 text-center text-bone/20 text-[10px] tracking-widest uppercase">Archive Empty.</div>
           ) : filteredProducts.map((product) => (
             <div key={product.id} className="p-4 flex gap-4 items-center">
-              <div className="w-16 h-20 flex-shrink-0 bg-black border border-gold/10 overflow-hidden">
+              <div className="w-16 h-20 flex-shrink-0 bg-black border border-gold/10 overflow-hidden relative">
                 <img src={product.images?.[0] || 'https://via.placeholder.com/300x400'} alt="" className="w-full h-full object-cover grayscale" />
+                {product.is_on_sale && (
+                  <div className="absolute top-0 left-0 bg-gold text-black text-[7px] font-bold px-1 py-0.5">SALE</div>
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-gold text-[11px] tracking-widest truncate font-serif italic">{product.name}</h3>
                 <p className="text-bone/40 text-[9px] uppercase tracking-tighter mt-1">{product.category} / {product.subcategory}</p>
-                <p className="text-bone text-[10px] mt-1 font-bold">{product.price.toLocaleString()} ₽</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-bone text-[10px] font-bold">{product.price.toLocaleString()} ₽</p>
+                  {product.is_on_sale && <span className="text-bone/20 line-through text-[8px]">{product.old_price.toLocaleString()} ₽</span>}
+                </div>
               </div>
               <div className="flex flex-col gap-3">
                 <Link href={`/admin/products/edit/${product.id}`} className="text-gold border border-gold/20 px-3 py-1 text-[8px] uppercase tracking-widest font-bold">Edit</Link>

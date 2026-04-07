@@ -73,6 +73,9 @@ export default function CategoryClient({
                 mainImage={mainAsset}
                 isVideo={checkIsVideo(mainAsset)}
                 sizes={product.sizes || []}
+                // Sale Logic integration
+                isOnSale={product.is_on_sale}
+                oldPrice={product.old_price ? Number(product.old_price) : null}
               />
             );
           })}

@@ -1,9 +1,9 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { createClient } from '../../../../../../lib/supabase/client';
 
-const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "One Size", "Custom"];
+const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "70B", "75B", "80B", "75C"];
 
 export default function EditProductPage() {
   const { id } = useParams();
@@ -28,15 +28,29 @@ export default function EditProductPage() {
         router.push('/admin/products');
         return;
       }
-      // Ensure sizes is always an array to avoid map errors
+      
       setFormData({
         ...data,
-        sizes: data.sizes || []
+        sizes: data.sizes || [],
+        is_on_sale: data.is_on_sale || false,
+        old_price: data.old_price || ""
       });
       setLoading(false);
     }
     fetchProduct();
   }, [id, supabase, router]);
+
+  // Calculate Discount Percentage for visual feedback
+  const discountLabel = useMemo(() => {
+    if (!formData) return null;
+    const cur = parseFloat(formData.price);
+    const old = parseFloat(formData.old_price);
+    if (formData.is_on_sale && cur && old && old > cur) {
+      const pct = Math.round(((old - cur) / old) * 100);
+      return `-${pct}% Discount`;
+    }
+    return null;
+  }, [formData]);
 
   const toggleSize = (size: string) => {
     const currentSizes = formData.sizes || [];
@@ -88,10 +102,12 @@ export default function EditProductPage() {
       .from('products')
       .update({
         name: formData.name,
-        price: formData.price,
+        price: parseFloat(formData.price),
+        old_price: formData.is_on_sale ? parseFloat(formData.old_price) : null,
+        is_on_sale: formData.is_on_sale,
         description: formData.description,
         images: formData.images,
-        sizes: formData.sizes // Syncing sizes array to Supabase
+        sizes: formData.sizes
       })
       .eq('id', id);
 
@@ -138,7 +154,7 @@ export default function EditProductPage() {
               </div>
             ))}
             <label key="upload-trigger" className={`aspect-[3/4] border border-dashed border-gold/10 flex flex-col items-center justify-center cursor-pointer hover:bg-white/[0.02] transition-all group ${uploading ? 'animate-pulse pointer-events-none' : ''}`}>
-              <input key={uploading ? 'active' : 'idle'} type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
+              <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} />
               <span className="text-gold/40 text-xl font-light group-hover:text-gold">+</span>
               <span className="text-[8px] uppercase tracking-widest text-gold/30 mt-4 text-center px-2">{uploading ? 'Syncing...' : 'Add Archive Image'}</span>
             </label>
@@ -147,7 +163,7 @@ export default function EditProductPage() {
 
         {/* DETAILS SECTION */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
-          <div className="space-y-2">
+          <div className="space-y-2 md:col-span-2">
             <label className="text-[9px] uppercase tracking-widest text-gold/40 block">Designation</label>
             <input 
               value={formData.name}
@@ -156,18 +172,49 @@ export default function EditProductPage() {
             />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-[9px] uppercase tracking-widest text-gold/40 block">Valuation (₽)</label>
-            <input 
-              type="number"
-              value={formData.price}
-              onChange={(e) => setFormData({...formData, price: parseInt(e.target.value) || 0})}
-              className="bg-transparent border-b border-gold/10 w-full py-3 text-bone focus:border-gold outline-none transition-all text-xl font-light"
-            />
+          {/* SALE & PRICING SECTION */}
+          <div className="md:col-span-2 pt-6 border-t border-gold/5 space-y-6">
+            <div className="flex items-center gap-3">
+              <input 
+                type="checkbox" 
+                id="editSaleToggle" 
+                checked={formData.is_on_sale} 
+                onChange={(e) => setFormData({...formData, is_on_sale: e.target.checked})}
+                className="w-4 h-4 accent-gold bg-charcoal border-gold/20"
+              />
+              <label htmlFor="editSaleToggle" className="text-[10px] uppercase tracking-[0.3em] text-gold cursor-pointer font-bold">Активировать скидку</label>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+              <div className="space-y-2">
+                <label className="text-[9px] uppercase tracking-widest text-gold/40 block">
+                  {formData.is_on_sale ? "Цена со скидкой (₽)" : "Valuation (₽)"}
+                </label>
+                <input 
+                  type="number"
+                  value={formData.price}
+                  onChange={(e) => setFormData({...formData, price: e.target.value})}
+                  className="bg-transparent border-b border-gold/10 w-full py-3 text-bone focus:border-gold outline-none transition-all text-xl font-light"
+                />
+              </div>
+
+              {formData.is_on_sale && (
+                <div className="space-y-2 animate-in fade-in slide-in-from-left-2">
+                  <label className="text-[9px] uppercase tracking-widest text-taupe block">Старая цена (₽)</label>
+                  <input 
+                    type="number"
+                    value={formData.old_price}
+                    onChange={(e) => setFormData({...formData, old_price: e.target.value})}
+                    className="bg-transparent border-b border-gold/10 w-full py-3 text-bone/40 focus:border-gold outline-none transition-all text-xl font-light line-through"
+                  />
+                </div>
+              )}
+            </div>
+            {discountLabel && <p className="text-[10px] text-gold italic tracking-[0.2em] font-medium">{discountLabel}</p>}
           </div>
 
           {/* SIZING SECTION */}
-          <div className="md:col-span-2 space-y-4">
+          <div className="md:col-span-2 space-y-4 pt-6">
             <label className="text-[9px] uppercase tracking-widest text-gold/40 block">Available Sizing</label>
             <div className="flex flex-wrap gap-3">
               {SIZE_OPTIONS.map((size) => (
