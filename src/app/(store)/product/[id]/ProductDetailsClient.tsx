@@ -2,16 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { createClient } from '../../../../lib/supabase/client';
 import { useCart } from '../../../../context/CartContext';
+
 export default function ProductDetailsClient({ product }: { product: any }) {
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [activeAssetIndex, setActiveAssetIndex] = useState(0);
   const [mounted, setMounted] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
-  
-  // Destructure addToCart from your context
-  const { addToCart } = useCart();
-  
-  const [isAddingToCart, setIsAddingToCart] = useState(false);
   
   const [showCheckout, setShowCheckout] = useState(false);
   const [formData, setFormData] = useState({
@@ -32,49 +28,6 @@ export default function ProductDetailsClient({ product }: { product: any }) {
   const isVideo = (url: string) => {
     if (!url) return false;
     return url.match(/\.(mp4|webm|ogg|mov|quicktime)/i);
-  };
-
-  const handleAddToCart = async () => {
-    if (!selectedSize) {
-      alert("Please select a dimension first.");
-      return;
-    }
-
-    setIsAddingToCart(true);
-
-    try {
-      // 1. Prepare the item for the local UI context
-      const cartItem = {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.images?.[0],
-        selectedSize: selectedSize,
-        quantity: 1,
-        category: product.category
-      };
-
-      // 2. Update the local Cart Context (This makes it show in the drawer)
-      addToCart(cartItem);
-
-      // 3. Keep the Supabase sync
-      const { error } = await supabase
-        .from('orders')
-        .insert([{
-          customer_name: "Cart Addition",
-          customer_email: "cart@aether.store",
-          total_amount: product.price,
-          status: 'pending_cart',
-          items: [cartItem]
-        }]);
-
-      if (error) throw error;
-      alert(`${product.name} added to your Atelier Bag.`);
-    } catch (err) {
-      console.error("Cart error:", err);
-    } finally {
-      setIsAddingToCart(false);
-    }
   };
 
   const handleBuyNow = async (e?: React.FormEvent) => {
@@ -201,19 +154,12 @@ export default function ProductDetailsClient({ product }: { product: any }) {
               </div>
             </div>
 
-            <div className="pt-6 space-y-4">
-              <button 
-                onClick={handleAddToCart}
-                disabled={isAddingToCart}
-                className="w-full md:w-96 bg-espresso text-bone py-6 text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-gold hover:text-espresso transition-all shadow-xl active:scale-95 disabled:opacity-50"
-              >
-                {isAddingToCart ? "Adding..." : "Add to Atelier Bag"}
-              </button>
-              
+            <div className="pt-6">
+              {/* Only Buy Now button remains */}
               <button 
                 onClick={() => selectedSize ? setShowCheckout(true) : alert("Please select a size first.")} 
                 disabled={isRedirecting} 
-                className="w-full md:w-96 bg-transparent border border-espresso text-espresso py-6 text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-espresso hover:text-bone transition-all active:scale-95 disabled:opacity-50"
+                className="w-full md:w-96 bg-espresso text-bone py-6 text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-gold hover:text-espresso transition-all shadow-xl active:scale-95 disabled:opacity-50"
               >
                 Buy Now
               </button>

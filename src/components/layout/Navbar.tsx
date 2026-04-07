@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useCart } from '../../context/CartContext';
 
 interface NavbarProps {
   adminData?: {
@@ -14,7 +13,6 @@ interface NavbarProps {
 export const Navbar = ({ adminData }: NavbarProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { cartCount, toggleCart } = useCart();
 
   useEffect(() => {
     setMounted(true);
@@ -69,30 +67,14 @@ export const Navbar = ({ adminData }: NavbarProps) => {
           </h2>
         </Link>
 
-        {/* Right Side Actions */}
-        <div className="flex items-center gap-6">
-          <div className="hidden md:flex gap-8 mr-6">
+        {/* Right Side Actions/Links */}
+        <div className="flex items-center">
+          <div className="hidden md:flex gap-8">
             {rightLinks.map((link) => (
               <Link key={link.name} href={link.href} className="text-[11px] uppercase tracking-[0.2em] text-espresso hover:text-gold transition-colors">
                 {link.name}
               </Link>
             ))}
-          </div>
-
-          <div className="flex gap-4 items-center text-espresso">
-            <button className="hover:text-gold transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-              </svg>
-            </button>
-            <button onClick={toggleCart} className="relative hover:text-gold transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-              </svg>
-              <span className="absolute -top-1 -right-1 bg-gold text-[9px] text-white rounded-full w-3.5 h-3.5 flex items-center justify-center font-bold">
-                {cartCount}
-              </span>
-            </button>
           </div>
         </div>
       </div>
