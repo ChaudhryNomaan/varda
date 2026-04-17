@@ -21,12 +21,12 @@ export const Hero = ({ data }: HeroProps) => {
   }, []);
 
   const defaults = {
-    subtitle: "Digital Archive",
-    titleMain: "AETHER",
-    titleAccent: "Atelier",
-    buttonText: "Explore Archive",
-    videoUrl: "",
-    fallbackImageUrl: ""
+    subtitle: "Yeni Koleksiyon Şimdi Yayında",
+    titleMain: "cura",
+    titleAccent: "STUDIO",
+    buttonText: "Koleksiyonu İncele",
+    videoUrl: "", // Öneri: Kumaş dokusunu gösteren yüksek kaliteli video
+    fallbackImageUrl: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80"
   };
 
   const content = data || defaults;
@@ -44,9 +44,9 @@ export const Hero = ({ data }: HeroProps) => {
 
   return (
     <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-[#0A0A0A]">
-      {/* Editorial Background Media */}
+      {/* Editoryal Arka Plan Medyası */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-black/30 z-10" />
+        <div className="absolute inset-0 bg-black/40 z-10" />
         
         {content.videoUrl ? (
           <video
@@ -77,25 +77,29 @@ export const Hero = ({ data }: HeroProps) => {
         )}
       </div>
 
-      {/* Content Overlay */}
+      {/* İçerik Katmanı */}
       <div className="relative z-20 text-center space-y-6 px-4">
-        <span className="text-white/90 tracking-[0.4em] uppercase text-[10px] md:text-xs font-light block transform animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        <span className="text-gold tracking-[0.6em] uppercase text-[10px] md:text-xs font-bold block transform animate-in fade-in slide-in-from-bottom-4 duration-1000">
           {content.subtitle}
         </span>
         
-        <h1 className="text-6xl md:text-9xl text-white font-serif italic tracking-tighter leading-none animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+        <h1 className="text-7xl md:text-[10rem] text-white font-serif italic tracking-tighter leading-none animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
           {content.titleMain} 
-          <span className="font-sans not-italic font-extralight tracking-[0.2em] ml-4 text-5xl md:text-7xl block md:inline mt-2 md:mt-0">
+          <span className="font-sans not-italic font-extralight tracking-[0.3em] ml-4 text-4xl md:text-6xl block md:inline mt-4 md:mt-0 opacity-80">
             {content.titleAccent}
           </span>
         </h1>
+
+        <p className="text-white/40 text-[10px] uppercase tracking-[0.4em] max-w-xs mx-auto animate-in fade-in duration-1000 delay-300">
+          Birinci sınıf ağır gramaj pamuk ve minimalist silüetler.
+        </p>
         
-        <div className="pt-10 animate-in fade-in zoom-in-95 duration-1000 delay-500">
-          <Link href="/collections">
-            <button className="group relative px-12 py-4 bg-transparent border border-white/30 text-white text-[10px] uppercase tracking-[0.5em] overflow-hidden transition-all duration-500 hover:border-white">
+        <div className="pt-8 animate-in fade-in zoom-in-95 duration-1000 delay-500">
+          <Link href="/collections/tshirts">
+            <button className="group relative px-14 py-5 bg-transparent border border-white/20 text-white text-[10px] uppercase tracking-[0.5em] overflow-hidden transition-all duration-500 hover:border-gold">
               <span className="relative z-10">{content.buttonText}</span>
-              <div className="absolute inset-0 bg-white translate-y-[101%] group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-              <span className="absolute inset-0 flex items-center justify-center text-[#0A0A0A] opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20">
+              <div className="absolute inset-0 bg-gold translate-y-[101%] group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+              <span className="absolute inset-0 flex items-center justify-center text-[#0A0A0A] font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20">
                 {content.buttonText}
               </span>
             </button>
@@ -103,12 +107,11 @@ export const Hero = ({ data }: HeroProps) => {
         </div>
       </div>
 
-      {/* Elegant Scroll Indicator */}
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-4 opacity-40">
-        <span className="text-[8px] uppercase tracking-[0.6em] text-white font-sans">Discover</span>
-        <div className="w-[1px] h-16 bg-white/10 relative overflow-hidden">
-          {/* This now uses the animation defined in tailwind.config.ts */}
-          <div className="absolute top-0 left-0 w-full h-full bg-white animate-hero-line" />
+      {/* Kaydırma Göstergesi */}
+      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-4 opacity-50">
+        <span className="text-[8px] uppercase tracking-[0.6em] text-white font-sans font-bold">Koleksiyonu Görmek İçin Kaydırın</span>
+        <div className="w-[1px] h-20 bg-white/10 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-full bg-gold animate-hero-line" />
         </div>
       </div>
     </section>

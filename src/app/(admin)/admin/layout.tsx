@@ -11,7 +11,6 @@ export default function AdminLayout({
       <AdminSidebar />
       
       {/* 2. Main Content Area */}
-      {/* Added 'scroll-smooth' for better transitions and kept your custom-scrollbar */}
       <main className="flex-1 h-screen overflow-y-auto relative custom-scrollbar scroll-smooth">
         
         {/* 3. Sticky Utility Header */}
@@ -22,8 +21,8 @@ export default function AdminLayout({
               <div className="absolute inset-0 w-2 h-2 rounded-full bg-gold/50 animate-ping" />
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-[0.5em] text-white/60 font-medium">AETHER Studio</span>
-              <span className="text-[7px] uppercase tracking-[0.3em] text-gold/40 -mt-0.5">Control Interface v1.0</span>
+              <span className="text-[10px] uppercase tracking-[0.5em] text-white/60 font-bold">cura Studio</span>
+              <span className="text-[7px] uppercase tracking-[0.3em] text-gold/40 -mt-0.5">Control Interface v2.1</span>
             </div>
           </div>
           
@@ -40,15 +39,14 @@ export default function AdminLayout({
 
         {/* 4. Dynamic Page Content */}
         <div className="p-12 pb-32">
-          {/* Constrained width with a subtle entrance animation */}
           <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000 ease-out">
             {children}
           </div>
         </div>
 
-        {/* 5. Watermark Identity */}
+        {/* 5. Watermark Identity - Updated to cura */}
         <div className="fixed bottom-12 right-12 pointer-events-none opacity-[0.03] select-none z-0">
-          <h2 className="text-[14vw] font-serif italic leading-none tracking-tighter">Aether</h2>
+          <h2 className="text-[14vw] font-serif italic leading-none tracking-tighter">cura</h2>
         </div>
       </main>
     </div>

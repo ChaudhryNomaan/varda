@@ -30,7 +30,6 @@ export default function ProductDetailsClient({ product }: { product: any }) {
     return url.match(/\.(mp4|webm|ogg|mov|quicktime)/i);
   };
 
-  // Calculate discount percentage for the UI
   const discountPercent = useMemo(() => {
     if (product.is_on_sale && product.old_price && product.price) {
       return Math.round(((product.old_price - product.price) / product.old_price) * 100);
@@ -42,7 +41,7 @@ export default function ProductDetailsClient({ product }: { product: any }) {
     if (e) e.preventDefault();
     
     if (!selectedSize) {
-      alert("Please select a dimension first.");
+      alert("Lütfen önce bir beden seçiniz.");
       return;
     }
 
@@ -52,9 +51,9 @@ export default function ProductDetailsClient({ product }: { product: any }) {
       const { error: saleError } = await supabase
         .from('orders')
         .insert([{
-          customer_name: formData.name || "Web Customer",
-          customer_email: formData.email || "pending@aether.store",
-          total_amount: product.price, // Uses discounted price if on sale
+          customer_name: formData.name || "Web Müşterisi",
+          customer_email: formData.email || "pending@cura.studio",
+          total_amount: product.price,
           status: 'completed',
           payment_method: 'Direct Inquiry',
           items: [{
@@ -77,18 +76,18 @@ export default function ProductDetailsClient({ product }: { product: any }) {
         .single();
 
       const activeMethod = settings?.active_notification_method || 'whatsapp';
-      const recipient = settings?.notification_recipient || '79000000000';
+      const recipient = settings?.notification_recipient || '905000000000';
 
       const productImage = product.images?.[0] || '';
       const messageText = 
-        `✨ NEW ORDER INQUIRY ✨\n\n` +
-        `Product: ${product.name}\n` +
-        `Size: ${selectedSize}\n` +
-        `Price: ${product.price?.toLocaleString()} ₽${product.is_on_sale ? ' (SALE)' : ''}\n` +
-        `Customer: ${formData.name || 'Inquiry'}\n` +
-        `Phone: ${formData.phone || 'Not provided'}\n` +
-        `Address: ${formData.address || 'Not provided'}\n\n` +
-        `Image Reference: ${productImage}`;
+        `✨ YENİ SİPARİŞ TALEBİ ✨\n\n` +
+        `Ürün: ${product.name}\n` +
+        `Beden: ${selectedSize}\n` +
+        `Fiyat: ${product.price?.toLocaleString()} TL${product.is_on_sale ? ' (İNDİRİM)' : ''}\n` +
+        `Müşteri: ${formData.name || 'Bilinmiyor'}\n` +
+        `Telefon: ${formData.phone || 'Belirtilmedi'}\n` +
+        `Adres: ${formData.address || 'Belirtilmedi'}\n\n` +
+        `Görsel Referansı: ${productImage}`;
 
       const encodedMessage = encodeURIComponent(messageText);
       let url = "";
@@ -99,8 +98,6 @@ export default function ProductDetailsClient({ product }: { product: any }) {
       } else if (activeMethod === 'telegram') {
         const cleanUser = recipient.replace('@', '');
         url = `https://t.me/${cleanUser}?text=${encodedMessage}`;
-      } else if (activeMethod === 'vk') {
-        url = `https://vk.me/${recipient}?message=${encodedMessage}`;
       }
 
       if (url) {
@@ -126,7 +123,7 @@ export default function ProductDetailsClient({ product }: { product: any }) {
             <div className="relative aspect-[3/4] bg-white/[0.03] overflow-hidden border border-taupe/10 shadow-2xl">
               {product.is_on_sale && (
                 <div className="absolute top-6 left-6 z-10 bg-gold text-black text-[10px] font-bold px-4 py-1 tracking-[0.2em] shadow-lg">
-                  SALE {discountPercent}%
+                  İNDİRİM %{discountPercent}
                 </div>
               )}
               {isVideo(activeAsset) ? (
@@ -149,17 +146,17 @@ export default function ProductDetailsClient({ product }: { product: any }) {
 
           <div className="flex flex-col justify-center space-y-12">
             <div className="space-y-4">
-              <span className="text-[10px] uppercase tracking-[0.5em] text-gold font-sans font-bold">{product.category} Collection</span>
+              <span className="text-[10px] uppercase tracking-[0.5em] text-gold font-sans font-bold">{product.category} Koleksiyonu</span>
               <h1 className="text-5xl md:text-6xl font-serif italic text-espresso tracking-tight">{product.name}</h1>
               
               <div className="flex flex-col">
                 {product.is_on_sale && product.old_price && (
                   <span className="text-sm text-taupe/50 line-through decoration-gold/30 font-sans tracking-widest mb-1">
-                    {product.old_price?.toLocaleString()} ₽
+                    {product.old_price?.toLocaleString()} TL
                   </span>
                 )}
                 <p className={`text-2xl font-serif italic ${product.is_on_sale ? 'text-gold' : 'text-espresso/80'}`}>
-                  {product.price?.toLocaleString()} ₽
+                  {product.price?.toLocaleString()} TL
                 </p>
               </div>
             </div>
@@ -167,7 +164,7 @@ export default function ProductDetailsClient({ product }: { product: any }) {
             <p className="text-[14px] leading-relaxed text-taupe/90 max-w-md font-light">{product.description}</p>
 
             <div className="space-y-6">
-              <span className="text-[10px] uppercase tracking-[0.3em] text-espresso font-bold">Select Dimension</span>
+              <span className="text-[10px] uppercase tracking-[0.3em] text-espresso font-bold">Beden Seçiniz</span>
               <div className="flex flex-wrap gap-3">
                 {product.sizes?.map((size: string) => (
                   <button key={size} onClick={() => setSelectedSize(size)} className={`px-8 py-3 text-[10px] uppercase border tracking-widest transition-all ${selectedSize === size ? "bg-espresso text-bone border-espresso shadow-lg scale-105" : "border-taupe/20 text-taupe hover:border-gold"}`}>
@@ -179,11 +176,11 @@ export default function ProductDetailsClient({ product }: { product: any }) {
 
             <div className="pt-6">
               <button 
-                onClick={() => selectedSize ? setShowCheckout(true) : alert("Please select a size first.")} 
+                onClick={() => selectedSize ? setShowCheckout(true) : alert("Lütfen önce bir beden seçiniz.")} 
                 disabled={isRedirecting} 
                 className="w-full md:w-96 bg-espresso text-bone py-6 text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-gold hover:text-espresso transition-all shadow-xl active:scale-95 disabled:opacity-50"
               >
-                Buy Now
+                Hemen Satın Al
               </button>
             </div>
           </div>
@@ -194,31 +191,31 @@ export default function ProductDetailsClient({ product }: { product: any }) {
         <div className="fixed inset-0 z-[200] flex items-center justify-end">
           <div className="absolute inset-0 bg-espresso/40 backdrop-blur-sm" onClick={() => setShowCheckout(false)} />
           <div className="relative w-full max-w-lg h-full bg-bone p-10 shadow-2xl animate-in slide-in-from-right duration-500 overflow-y-auto">
-            <button onClick={() => setShowCheckout(false)} className="absolute top-8 right-8 text-[10px] uppercase tracking-widest text-taupe hover:text-espresso">Close</button>
+            <button onClick={() => setShowCheckout(false)} className="absolute top-8 right-8 text-[10px] uppercase tracking-widest text-taupe hover:text-espresso">Kapat</button>
             
             <div className="mt-16">
-              <span className="text-[10px] uppercase tracking-[0.4em] text-gold font-bold">Order Placement</span>
-              <h2 className="text-3xl font-serif italic text-espresso mt-2 mb-10">Shipping Details</h2>
+              <span className="text-[10px] uppercase tracking-[0.4em] text-gold font-bold">Sipariş Oluştur</span>
+              <h2 className="text-3xl font-serif italic text-espresso mt-2 mb-10">Teslimat Bilgileri</h2>
               
               <form onSubmit={handleBuyNow} className="space-y-6">
                 <div className="space-y-1 border-b border-taupe/20 pb-2">
-                  <label className="text-[9px] uppercase tracking-widest text-taupe">Full Name</label>
-                  <input required className="w-full bg-transparent outline-none text-espresso font-serif italic" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="Full Name" />
+                  <label className="text-[9px] uppercase tracking-widest text-taupe">Ad Soyad</label>
+                  <input required className="w-full bg-transparent outline-none text-espresso font-serif italic" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="Ad Soyad" />
                 </div>
                 
                 <div className="space-y-1 border-b border-taupe/20 pb-2">
-                  <label className="text-[9px] uppercase tracking-widest text-taupe">Email Address</label>
-                  <input type="email" required className="w-full bg-transparent outline-none text-espresso text-sm" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="email@example.com" />
+                  <label className="text-[9px] uppercase tracking-widest text-taupe">E-posta Adresi</label>
+                  <input type="email" required className="w-full bg-transparent outline-none text-espresso text-sm" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="eposta@ornek.com" />
                 </div>
 
                 <div className="space-y-1 border-b border-taupe/20 pb-2">
-                  <label className="text-[9px] uppercase tracking-widest text-taupe">Contact Phone</label>
-                  <input type="tel" required className="w-full bg-transparent outline-none text-espresso text-sm" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="+7 ..." />
+                  <label className="text-[9px] uppercase tracking-widest text-taupe">İletişim Numarası</label>
+                  <input type="tel" required className="w-full bg-transparent outline-none text-espresso text-sm" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="+90 ..." />
                 </div>
 
                 <div className="space-y-1 border-b border-taupe/20 pb-2">
-                  <label className="text-[9px] uppercase tracking-widest text-taupe">Delivery Address</label>
-                  <textarea required rows={3} className="w-full bg-transparent outline-none text-espresso text-sm resize-none" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} placeholder="Street, City, Postcode" />
+                  <label className="text-[9px] uppercase tracking-widest text-taupe">Teslimat Adresi</label>
+                  <textarea required rows={3} className="w-full bg-transparent outline-none text-espresso text-sm resize-none" value={formData.address} onChange={e => setFormData({...formData, address: e.target.value})} placeholder="Mahalle, Sokak, No, İlçe/İl" />
                 </div>
 
                 <div className="pt-8">
@@ -227,7 +224,7 @@ export default function ProductDetailsClient({ product }: { product: any }) {
                     disabled={isRedirecting}
                     className="w-full bg-espresso text-bone py-6 text-[10px] font-bold uppercase tracking-[0.4em] hover:bg-gold hover:text-espresso transition-all active:scale-95 disabled:opacity-50"
                   >
-                    {isRedirecting ? "Syncing with Ledger..." : `Confirm Order — ${product.price?.toLocaleString()} ₽`}
+                    {isRedirecting ? "Bağlanıyor..." : `Siparişi Onayla — ${product.price?.toLocaleString()} TL`}
                   </button>
                 </div>
               </form>

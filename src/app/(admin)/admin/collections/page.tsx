@@ -30,7 +30,7 @@ export default function AdminCollections() {
     setLoading(false);
   }
 
-  const trackChange = (id: string, field: string, value: string) => {
+  const trackChange = (id: string, field: string, value: any) => {
     setPendingChanges(prev => ({
       ...prev,
       [id]: {
@@ -49,17 +49,12 @@ export default function AdminCollections() {
       for (const [id, payload] of changeEntries) {
         const { id: _id, created_at: _ca, ...cleanUpdate } = payload;
 
-        const { data, error } = await supabase
+        const { error } = await supabase
           .from('collections')
           .update(cleanUpdate)
-          .eq('id', id)
-          .select();
+          .eq('id', id);
 
         if (error) throw error;
-
-        if (!data || data.length === 0) {
-          throw new Error(`Database rejected the update for ID: ${id}. This is usually an RLS policy issue.`);
-        }
       }
 
       setCollections(prev => prev.map(col => {
@@ -70,10 +65,10 @@ export default function AdminCollections() {
       }));
 
       setPendingChanges({});
-      alert("AETHER Archive synchronized successfully.");
+      alert("Editorial Archive successfully synchronized.");
     } catch (err: any) {
-      console.error("Supabase Sync Error:", err);
-      alert(`Sync Failed: ${err.message}`);
+      console.error("Sync Error:", err);
+      alert(`Synchronization Failed: ${err.message}`);
     } finally {
       setIsSaving(false);
     }
@@ -83,10 +78,9 @@ export default function AdminCollections() {
     const { data, error } = await supabase
       .from('collections')
       .insert([{ 
-        title: 'New Collection', 
-        subtitle: 'Sub-text', 
-        href: '/category/atelier', // Updated default path
-        subcategory: 'Все',         // Added default subcategory
+        title: 'New Archive Entry', 
+        href: '/collections/tshirts', 
+        is_on_sale: false, 
         image: '' 
       }])
       .select();
@@ -97,13 +91,10 @@ export default function AdminCollections() {
   };
 
   const deleteCollection = async (id: string) => {
-    if (!confirm("Are you sure? This action is permanent.")) return;
+    if (!confirm("Permanently remove this collection from the editorial showcase?")) return;
     const { error } = await supabase.from('collections').delete().eq('id', id);
     if (!error) {
       setCollections(collections.filter(c => c.id !== id));
-      const newPending = { ...pendingChanges };
-      delete newPending[id];
-      setPendingChanges(newPending);
     }
   };
 
@@ -114,14 +105,14 @@ export default function AdminCollections() {
     setUploading(true);
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${id}-${Date.now()}.${fileExt}`;
+      const fileName = `showcase-${id}-${Date.now()}.${fileExt}`;
       const { error: uploadError } = await supabase.storage.from('products').upload(fileName, file);
       if (uploadError) throw uploadError;
 
       const { data: urlData } = supabase.storage.from('products').getPublicUrl(fileName);
       trackChange(id, 'image', urlData.publicUrl);
     } catch (err: any) {
-      alert("Upload error: " + err.message);
+      alert("Media upload failed: " + err.message);
     } finally {
       setUploading(false);
       setEditingId(null);
@@ -132,21 +123,21 @@ export default function AdminCollections() {
   const hasUnsavedChanges = Object.keys(pendingChanges).length > 0;
 
   if (loading) return (
-    <div className="p-10 bg-[#0A0A0A] min-h-screen flex items-center justify-center font-serif">
-      <span className="text-[10px] uppercase tracking-[0.8em] text-gold animate-pulse font-sans">AETHER ARCHIVE LOADING...</span>
+    <div className="p-10 bg-[#0A0A0A] min-h-screen flex items-center justify-center">
+      <span className="text-[10px] uppercase tracking-[0.8em] text-gold animate-pulse">Initializing Editorial Vault...</span>
     </div>
   );
 
   return (
-    <div className="max-w-7xl p-6 md:p-10 bg-[#0A0A0A] min-h-screen text-bone pb-40">
+    <div className="max-w-7xl p-6 md:p-10 bg-[#0A0A0A] min-h-screen text-bone pb-40 mx-auto">
       <div className="mb-12 flex justify-between items-end">
         <div>
-          <span className="text-[10px] uppercase tracking-[0.5em] text-gold/60 font-bold font-sans">Editorial Control</span>
-          <h1 className="text-4xl font-serif italic mt-2 text-gold">Коллекции</h1>
+          <span className="text-[10px] uppercase tracking-[0.5em] text-gold/60 font-bold">Curated Content</span>
+          <h1 className="text-4xl font-serif italic mt-2 text-gold">Showcase Management</h1>
         </div>
         
-        <button onClick={addNewCollection} className="px-6 py-2 border border-gold/40 text-[10px] uppercase tracking-widest text-gold hover:bg-gold hover:text-black transition-all duration-500 font-sans">
-          + Add New Collection
+        <button onClick={addNewCollection} className="px-6 py-2 border border-gold/40 text-[10px] uppercase tracking-widest text-gold hover:bg-gold hover:text-black transition-all">
+          + New Collection Card
         </button>
       </div>
 
@@ -156,62 +147,55 @@ export default function AdminCollections() {
           const isModified = !!pendingChanges[col.id];
 
           return (
-            <div key={col.id} className={`border ${isModified ? 'border-gold shadow-[0_0_15px_rgba(212,175,55,0.1)]' : 'border-gold/10'} bg-white/5 group relative transition-all duration-500`}>
-              <button onClick={() => deleteCollection(col.id)} className="absolute top-2 right-2 z-10 bg-black/80 p-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-400">
+            <div key={col.id} className={`border ${isModified ? 'border-gold' : 'border-gold/10'} bg-white/5 group relative transition-all`}>
+              <button onClick={() => deleteCollection(col.id)} className="absolute top-2 right-2 z-10 bg-black/80 p-2 opacity-0 group-hover:opacity-100 transition-opacity text-red-500">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
 
-              <div className="aspect-[3/4] bg-espresso relative overflow-hidden">
-                {isVideo(displayData.image) ? (
-                  <video key={displayData.image} src={displayData.image} autoPlay loop muted playsInline className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-all duration-700" />
+              <div className="aspect-[3/4] bg-neutral-900 relative overflow-hidden">
+                {displayData.image ? (
+                  isVideo(displayData.image) ? (
+                    <video src={displayData.image} autoPlay loop muted playsInline className="w-full h-full object-cover opacity-70" />
+                  ) : (
+                    <img src={displayData.image} className="w-full h-full object-cover opacity-70" alt="" />
+                  )
                 ) : (
-                  <img key={displayData.image} src={displayData.image || 'https://via.placeholder.com/600x800?text=No+Media'} className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-all duration-700" alt="" />
+                  <div className="w-full h-full flex items-center justify-center text-[10px] text-gold/20 uppercase tracking-widest">Asset Missing</div>
                 )}
+                
                 <div onClick={() => { setEditingId(col.id); fileInputRef.current?.click(); }} className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-all cursor-pointer">
-                   <div className="border border-gold/40 px-5 py-2">
-                    <span className="text-[9px] uppercase tracking-widest text-gold font-bold font-sans">Change Media</span>
-                  </div>
+                  <span className="text-[9px] uppercase tracking-widest text-gold border border-gold/40 px-4 py-2">Update Asset</span>
                 </div>
               </div>
 
-              <div className="p-6 space-y-6">
-                <div>
-                  <label className="text-[8px] uppercase tracking-widest text-gold/40 block mb-2 font-sans">Title</label>
+              <div className="p-6 space-y-4">
+                <div className="flex flex-col space-y-1">
+                  <label className="text-[8px] uppercase tracking-widest text-gold/40">Archive Title</label>
                   <input 
-                      value={displayData.title} 
-                      onChange={(e) => trackChange(col.id, 'title', e.target.value)} 
-                      className="bg-transparent border-b border-gold/10 w-full text-xl font-serif italic text-gold py-1 focus:border-gold outline-none transition-colors" 
+                    value={displayData.title} 
+                    onChange={(e) => trackChange(col.id, 'title', e.target.value)} 
+                    className="bg-transparent border-b border-gold/10 w-full text-lg font-serif italic text-gold py-1 outline-none focus:border-gold" 
                   />
                 </div>
 
-                {/* Added Subcategory field to manage the filters */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-[8px] uppercase tracking-widest text-gold/40 block mb-2 font-sans">Subcategory</label>
-                    <input 
-                        value={displayData.subcategory || ''} 
-                        placeholder="e.g. корсеты"
-                        onChange={(e) => trackChange(col.id, 'subcategory', e.target.value)} 
-                        className="bg-transparent border-b border-gold/10 w-full text-[10px] text-bone py-1 focus:border-gold outline-none transition-colors font-sans" 
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[8px] uppercase tracking-widest text-gold/40 block mb-2 font-sans">Href Path</label>
-                    <input 
-                        value={displayData.href} 
-                        onChange={(e) => trackChange(col.id, 'href', e.target.value)} 
-                        className="bg-transparent border-b border-gold/10 w-full text-[11px] font-mono text-bone/40 py-1 focus:border-gold outline-none transition-colors" 
-                    />
-                  </div>
+                <div className="flex flex-col space-y-1">
+                  <label className="text-[8px] uppercase tracking-widest text-gold/40">Navigation Route (Slug)</label>
+                  <input 
+                    value={displayData.href} 
+                    onChange={(e) => trackChange(col.id, 'href', e.target.value)} 
+                    placeholder="/collections/tshirts"
+                    className="bg-transparent border-b border-gold/10 w-full text-[11px] font-mono text-bone/60 py-1 outline-none focus:border-gold" 
+                  />
                 </div>
 
-                <div>
-                  <label className="text-[8px] uppercase tracking-widest text-gold/40 block mb-2 font-sans">Subtitle</label>
-                  <input 
-                      value={displayData.subtitle} 
-                      onChange={(e) => trackChange(col.id, 'subtitle', e.target.value)} 
-                      className="bg-transparent border-b border-gold/10 w-full text-[10px] uppercase tracking-[0.3em] text-bone/60 py-1 focus:border-gold outline-none transition-colors font-sans" 
-                  />
+                <div className="flex items-center justify-between pt-2">
+                  <span className="text-[9px] uppercase tracking-widest text-bone/40">Sale Status</span>
+                  <button 
+                    onClick={() => trackChange(col.id, 'is_on_sale', !displayData.is_on_sale)}
+                    className={`text-[9px] uppercase tracking-widest px-3 py-1 border transition-all ${displayData.is_on_sale ? 'bg-gold text-black border-gold' : 'border-gold/20 text-gold/40'}`}
+                  >
+                    {displayData.is_on_sale ? 'Active Sale' : 'Standard'}
+                  </button>
                 </div>
               </div>
             </div>
@@ -219,30 +203,18 @@ export default function AdminCollections() {
         })}
       </div>
 
-      {/* FLOATING ACTION BAR */}
       {hasUnsavedChanges && (
-        <div className="fixed bottom-0 left-0 right-0 bg-gold p-6 flex justify-between items-center z-[100] shadow-[0_-10px_40px_rgba(0,0,0,0.5)] animate-in slide-in-from-bottom-full duration-500">
-          <div className="flex flex-col font-sans">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-black rounded-full animate-pulse" />
-              <span className="text-black text-[10px] font-bold uppercase tracking-[0.3em]">Pending Synchronization</span>
-            </div>
-            <span className="text-black/60 text-[9px] uppercase tracking-tighter italic">Archive contains {Object.keys(pendingChanges).length} unsaved updates</span>
+        <div className="fixed bottom-0 left-0 right-0 bg-gold p-6 flex justify-between items-center z-[100] shadow-2xl">
+          <div className="flex flex-col">
+            <span className="text-black text-[10px] font-bold uppercase tracking-widest">Pending Editorial Updates</span>
+            <span className="text-black/60 text-[9px] uppercase italic">{Object.keys(pendingChanges).length} entries modified</span>
           </div>
-          <div className="flex gap-6 font-sans">
-            <button 
-              onClick={() => fetchCollections()} 
-              disabled={isSaving}
-              className="text-[10px] uppercase tracking-widest text-black/40 hover:text-black transition-colors disabled:opacity-30"
-            >
+          <div className="flex gap-6">
+            <button onClick={() => fetchCollections()} disabled={isSaving} className="text-[10px] uppercase tracking-widest text-black/40 hover:text-black">
               Discard Changes
             </button>
-            <button 
-                onClick={confirmAndSaveAll} 
-                disabled={isSaving}
-                className="bg-black text-gold px-12 py-3 text-[10px] uppercase tracking-[0.2em] font-bold hover:scale-[1.02] active:scale-95 transition-all shadow-2xl disabled:opacity-50"
-            >
-                {isSaving ? 'Syncing AETHER...' : 'Confirm & Sync Archive'}
+            <button onClick={confirmAndSaveAll} disabled={isSaving} className="bg-black text-gold px-10 py-3 text-[10px] uppercase tracking-widest font-bold hover:bg-neutral-800 transition-all">
+                {isSaving ? 'Synchronizing...' : 'Publish Changes'}
             </button>
           </div>
         </div>
@@ -251,8 +223,8 @@ export default function AdminCollections() {
       <input type="file" ref={fileInputRef} className="hidden" accept="image/*,video/*" onChange={(e) => editingId && handleMediaUpload(e, editingId)} />
 
       {uploading && (
-        <div className="fixed bottom-10 right-10 bg-black border border-gold text-gold px-8 py-4 text-[10px] font-bold uppercase tracking-widest animate-pulse z-[110] font-sans">
-          Processing Media...
+        <div className="fixed bottom-10 right-10 bg-black border border-gold text-gold px-8 py-4 text-[10px] font-bold uppercase tracking-widest animate-pulse z-[110]">
+          Processing Media Asset...
         </div>
       )}
     </div>

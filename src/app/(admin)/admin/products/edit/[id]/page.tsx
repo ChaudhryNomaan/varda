@@ -4,6 +4,10 @@ import { useParams, useRouter } from 'next/navigation';
 import { createClient } from '../../../../../../lib/supabase/client';
 
 const SIZE_OPTIONS = ["XS", "S", "M", "L", "XL", "70B", "75B", "80B", "75C"];
+const CATEGORY_OPTIONS = [
+  { label: "Футболки", value: "tshirts" },
+  { label: "Other", value: "other" }
+];
 
 export default function EditProductPage() {
   const { id } = useParams();
@@ -33,14 +37,14 @@ export default function EditProductPage() {
         ...data,
         sizes: data.sizes || [],
         is_on_sale: data.is_on_sale || false,
-        old_price: data.old_price || ""
+        old_price: data.old_price || "",
+        category: data.category || "tshirts"
       });
       setLoading(false);
     }
     fetchProduct();
   }, [id, supabase, router]);
 
-  // Calculate Discount Percentage for visual feedback
   const discountLabel = useMemo(() => {
     if (!formData) return null;
     const cur = parseFloat(formData.price);
@@ -105,6 +109,7 @@ export default function EditProductPage() {
         price: parseFloat(formData.price),
         old_price: formData.is_on_sale ? parseFloat(formData.old_price) : null,
         is_on_sale: formData.is_on_sale,
+        category: formData.category,
         description: formData.description,
         images: formData.images,
         sizes: formData.sizes
@@ -122,7 +127,7 @@ export default function EditProductPage() {
 
   if (loading) return (
     <div className="p-32 text-center text-gold animate-pulse tracking-[0.6em] font-sans text-[10px] uppercase">
-      Accessing Secure Archive...
+      Accessing cura Archive...
     </div>
   );
 
@@ -163,13 +168,33 @@ export default function EditProductPage() {
 
         {/* DETAILS SECTION */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
-          <div className="space-y-2 md:col-span-2">
+          <div className="space-y-2 md:col-span-1">
             <label className="text-[9px] uppercase tracking-widest text-gold/40 block">Designation</label>
             <input 
               value={formData.name}
               onChange={(e) => setFormData({...formData, name: e.target.value})}
               className="bg-transparent border-b border-gold/10 w-full py-3 text-bone focus:border-gold outline-none transition-all font-serif italic text-2xl"
             />
+          </div>
+
+          <div className="space-y-2 md:col-span-1">
+            <label className="text-[9px] uppercase tracking-widest text-gold/40 block mb-3">Classification</label>
+            <div className="flex gap-4">
+              {CATEGORY_OPTIONS.map((cat) => (
+                <button
+                  key={cat.value}
+                  type="button"
+                  onClick={() => setFormData({...formData, category: cat.value})}
+                  className={`px-6 py-2 text-[10px] uppercase tracking-[0.2em] border transition-all ${
+                    formData.category === cat.value 
+                      ? "bg-bone text-black border-bone font-bold" 
+                      : "border-gold/10 text-bone/40 hover:border-gold/30"
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* SALE & PRICING SECTION */}
@@ -182,7 +207,7 @@ export default function EditProductPage() {
                 onChange={(e) => setFormData({...formData, is_on_sale: e.target.checked})}
                 className="w-4 h-4 accent-gold bg-charcoal border-gold/20"
               />
-              <label htmlFor="editSaleToggle" className="text-[10px] uppercase tracking-[0.3em] text-gold cursor-pointer font-bold">Активировать скидку</label>
+              <label htmlFor="editSaleToggle" className="text-[10px] uppercase tracking-[0.3em] text-gold cursor-pointer font-bold">Активировать скидку (Move to Sale Archive)</label>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">

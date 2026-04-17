@@ -27,7 +27,6 @@ export default function ReturnsPage() {
 
     fetchPolicy();
 
-    // REAL-TIME SYNC: If you change it in Admin, it changes here instantly
     const channel = supabase
       .channel('returns-updates')
       .on('postgres_changes', 
@@ -43,7 +42,6 @@ export default function ReturnsPage() {
     return () => { supabase.removeChannel(channel); };
   }, [supabase]);
 
-  // Prevent the "Micro-second Jump" by showing a clean loader
   if (!mounted || loading) {
     return (
       <div className="min-h-screen bg-bone flex items-center justify-center">
@@ -52,15 +50,15 @@ export default function ReturnsPage() {
     );
   }
 
-  // Fallback if the database is literally empty
+  // Turkish Fallback Content
   const displayData = data || {
-    title: "Возврат и Обмен",
-    subtitle: "AETHER Quality Assurance",
-    conditionsText: "",
-    exceptionsText: "",
-    defectPolicy: "",
-    conciergeEmail: "",
-    telegramHandle: ""
+    title: "İade ve Değişim",
+    subtitle: "CURA Kalite Güvencesi",
+    conditionsText: "Ürünlerimizi teslim aldığınız tarihten itibaren 14 gün içinde, kullanılmamış ve orijinal etiketleri üzerinde olması kaydıyla iade edebilirsiniz.",
+    exceptionsText: "Hijyen kuralları gereği iç giyim ve kişiselleştirilmiş ürünlerde iade kabul edilmemektedir.",
+    defectPolicy: "Üretim kaynaklı bir kusur olması durumunda, tüm değişim ve kargo masrafları tarafımıza aittir.",
+    conciergeEmail: "concierge@cura.studio",
+    telegramHandle: "@curastudio"
   };
 
   return (
@@ -69,7 +67,7 @@ export default function ReturnsPage() {
         
         {/* Conditions Section */}
         <div>
-          <h2 className="text-[11px] uppercase tracking-[0.3em] text-espresso font-bold mb-4">Условия возврата</h2>
+          <h2 className="text-[11px] uppercase tracking-[0.3em] text-espresso font-bold mb-4">İade Koşulları</h2>
           <p className="text-[13px] leading-relaxed text-espresso/80 font-light">
             {displayData.conditionsText}
           </p>
@@ -86,7 +84,7 @@ export default function ReturnsPage() {
 
         {/* Defect Policy */}
         <div>
-          <h2 className="text-[11px] uppercase tracking-[0.3em] text-espresso font-bold mb-4">Брак или несоответствие</h2>
+          <h2 className="text-[11px] uppercase tracking-[0.3em] text-espresso font-bold mb-4">Kusurlu Ürün Politikası</h2>
           <p className="text-[13px] leading-relaxed text-espresso/80 font-light">
             {displayData.defectPolicy}
           </p>
@@ -94,21 +92,21 @@ export default function ReturnsPage() {
 
         {/* Process Steps */}
         <div>
-          <h2 className="text-[11px] uppercase tracking-[0.3em] text-espresso font-bold mb-4">Процесс оформления</h2>
+          <h2 className="text-[11px] uppercase tracking-[0.3em] text-espresso font-bold mb-4">İşlem Süreci</h2>
           <ol className="space-y-4 text-[13px] text-espresso/80 font-light">
             <li className="flex gap-4 items-start">
               <span className="text-gold/50 font-serif italic text-lg leading-none">01</span>
-              <span>Сфотографируйте изделие и оригинальные бирки в хорошем освещении.</span>
+              <span>Ürünün ve orijinal etiketlerinin gün ışığında net fotoğraflarını çekin.</span>
             </li>
             <li className="flex gap-4 items-start">
               <span className="text-gold/50 font-serif italic text-lg leading-none">02</span>
               <span>
-                Отправьте письмо на <span className="text-gold font-medium border-b border-gold/20 pb-0.5">{displayData.conciergeEmail}</span> с номером заказа.
+                Sipariş numaranızla birlikte <span className="text-gold font-medium border-b border-gold/20 pb-0.5">{displayData.conciergeEmail}</span> adresine e-posta gönderin.
               </span>
             </li>
             <li className="flex gap-4 items-start">
               <span className="text-gold/50 font-serif italic text-lg leading-none">03</span>
-              <span>Дождитесь подтверждения от нашего консьерж-сервиса в течение 24 часов.</span>
+              <span>Konseyerj servisimizden 24 saat içinde onay onayı bekleyin.</span>
             </li>
           </ol>
         </div>
@@ -116,7 +114,7 @@ export default function ReturnsPage() {
         {/* Footer Contact */}
         <div className="pt-12 border-t border-taupe/20 text-center">
           <p className="text-[9px] text-taupe tracking-[0.5em] uppercase">
-            Concierge Support: {displayData.telegramHandle}
+            Konseyerj Desteği: {displayData.telegramHandle}
           </p>
         </div>
       </section>

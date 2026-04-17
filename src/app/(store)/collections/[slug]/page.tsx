@@ -1,28 +1,31 @@
+// File Path: src/app/(store)/collections/[slug]/page.tsx
+
 import { createClient } from '../../../../lib/supabase/server';
 import CategoryClient from './CategoryClient'; 
 
-// Ensures the shop reflects price changes/sales immediately
 export const revalidate = 0; 
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const supabase = await createClient();
 
-  // Fetching products on the server for instant hydration
+  // Tüm ürünleri çekiyoruz; filtreleme ve kategori mantığı 
+  // Turkish localization destekli CategoryClient tarafında yönetiliyor.
   const { data: initialProducts, error } = await supabase
     .from('products')
     .select('*')
-    .eq('category', slug)
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error("Archive fetch error:", error);
+    console.error("Kategori verisi çekilemedi:", error);
   }
 
   return (
-    <CategoryClient 
-      slug={slug} 
-      initialProducts={initialProducts || []} 
-    />
+    <main className="bg-bone min-h-screen">
+      <CategoryClient 
+        slug={slug} 
+        initialProducts={initialProducts || []} 
+      />
+    </main>
   );
 }

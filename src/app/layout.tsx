@@ -1,16 +1,4 @@
-import { Inter, Playfair_Display } from "next/font/google";
 import "../styles/globals.css";
-
-const inter = Inter({ 
-  subsets: ["latin", "cyrillic"], 
-  variable: '--font-inter' 
-});
-
-const playfair = Playfair_Display({ 
-  subsets: ["latin", "cyrillic"], 
-  style: ['italic'], 
-  variable: '--font-playfair' 
-});
 
 export default function RootLayout({
   children,
@@ -21,8 +9,18 @@ export default function RootLayout({
     <html 
       lang="ru" 
       suppressHydrationWarning 
-      className={`${inter.variable} ${playfair.variable}`}
+      className="inter-var playfair-var"
     >
+      <head>
+        {/* Bypass Next.js font bug with a direct stable link */}
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Playfair+Display:ital,wght@1,400..900&display=swap" rel="stylesheet" />
+        <style>{`
+          :root {
+            --font-inter: 'Inter', sans-serif;
+            --font-playfair: 'Playfair Display', serif;
+          }
+        `}</style>
+      </head>
       <body className="bg-[#0A0A0A] text-bone antialiased">
         {children} 
       </body>

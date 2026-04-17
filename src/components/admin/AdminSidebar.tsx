@@ -6,38 +6,38 @@ import { createClient } from '../../lib/supabase/client';
 
 const SECTIONS = [
   {
-    title: 'Аналитика', // New Section for tracking sales
+    title: 'Analytics',
     links: [
-      { name: 'Продажи и Выручка', href: '/admin/sales' },
+      { name: 'Sales & Revenue', href: '/admin/sales' },
     ]
   },
   {
-    title: 'Магазин',
+    title: 'Inventory',
     links: [
-      { name: 'Товары', href: '/admin/products' },
-      { name: 'Коллекции', href: '/admin/collections' },
+      { name: 'Products', href: '/admin/products' },
+      { name: 'Collections', href: '/admin/collections' },
     ]
   },
   {
-    title: 'Интерфейс',
+    title: 'Interface',
     links: [
-      { name: 'Главный экран', href: '/admin/hero' },
-      { name: 'Навигация', href: '/admin/settings/navbar' },
-      { name: 'Подвал (Footer)', href: '/admin/settings/footer' },
+      { name: 'Hero Cinema', href: '/admin/hero' },
+      { name: 'Navigation', href: '/admin/settings/navbar' },
+      { name: 'Footer Archive', href: '/admin/settings/footer' },
     ]
   },
   {
-    title: 'Уведомления',
+    title: 'Communication',
     links: [
-      { name: 'Настройка заказов', href: '/admin/products/contact' },
+      { name: 'Order Protocols', href: '/admin/products/contact' },
     ]
   },
   {
-    title: 'Информация',
+    title: 'Configuration',
     links: [
-      { name: 'Возврат и Обмен', href: '/admin/settings/returns' },
-      { name: 'Доставка', href: '/admin/settings/shipping' },
-      { name: 'Таблица размеров', href: '/admin/settings/size-guide' },
+      { name: 'Returns & Exchange', href: '/admin/settings/returns' },
+      { name: 'Shipping Policy', href: '/admin/settings/shipping' },
+      { name: 'Size Guide', href: '/admin/settings/size-guide' },
     ]
   }
 ];
@@ -129,7 +129,7 @@ export const AdminSidebar = () => {
         {/* BOTTOM ACTION SECTION */}
         <div className="pt-8 space-y-6 border-t border-gold/10 mt-auto">
           <Link href="/" target="_blank" className="text-[9px] uppercase tracking-[0.2em] text-bone/30 hover:text-gold transition-colors flex items-center gap-2">
-            <span className="font-sans">Просмотр сайта</span>
+            <span className="font-sans">View Live Site</span>
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
@@ -139,7 +139,7 @@ export const AdminSidebar = () => {
             onClick={handleLogout}
             className="text-[9px] uppercase tracking-[0.2em] text-red-900/40 hover:text-red-500 transition-all duration-500 text-left border-t border-white/5 pt-4 w-full"
           >
-            Завершить сеанс
+            Terminate Session
           </button>
         </div>
       </aside>

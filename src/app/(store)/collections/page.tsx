@@ -1,25 +1,30 @@
+// File Path: src/app/(store)/collections/sale/page.tsx
+
 import { createClient } from '../../../lib/supabase/server';
 import CollectionsClient from './CollectionsClient';
 
-// Ensure editorial changes to collections are reflected instantly
 export const revalidate = 0;
 
-export default async function CollectionsPage() {
+export default async function SalePage() {
   const supabase = await createClient();
 
-  // Fetching the editorial collections for the main showcase
-  const { data: initialCollections, error } = await supabase
-    .from('collections')
+  // "İndirim" (Sale) ürünlerini çekiyoruz
+  const { data: saleProducts, error } = await supabase
+    .from('products')
     .select('*')
-    .order('created_at', { ascending: true });
+    .eq('is_on_sale', true)
+    .order('created_at', { ascending: false });
 
   if (error) {
-    console.error("Collections fetch error:", error);
+    console.error("Sale fetch error:", error);
   }
 
   return (
-    <CollectionsClient 
-      initialCollections={initialCollections || []} 
-    />
+    <main className="min-h-screen bg-bone pt-24">
+      {/* If CollectionsClient accepts a title prop, you should pass "İndirim" here. 
+        Example: <CollectionsClient title="İndirim" initialProducts={saleProducts || []} />
+      */}
+      <CollectionsClient initialProducts={saleProducts || []} />
+    </main>
   );
 }

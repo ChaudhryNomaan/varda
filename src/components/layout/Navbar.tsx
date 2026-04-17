@@ -18,72 +18,85 @@ export const Navbar = ({ adminData }: NavbarProps) => {
     setMounted(true);
   }, []);
 
-  // Updated defaults to AETHER for a high-end feel
+  // Updated defaults with Turkish categories
   const data = adminData || {
-    logoMain: "AETHER",
+    logoMain: "cura",
     logoAccent: "STUDIO",
     links: [
-      { name: 'Коллекции', href: '/collections' },
-      { name: 'Белье', href: '/collections/lingerie' },
-      { name: 'Шелк', href: '/collections/silk' },
-      { name: 'Atelier', href: '/collections/atelier' },
+      { name: 'İndirim', href: '/collections/sale' },
+      { name: 'T-shirt', href: '/collections/tshirts' },
     ]
   };
 
-  // Logic to split links evenly around the centered logo
-  const middleIndex = Math.ceil(data.links.length / 2);
-  const leftLinks = data.links.slice(0, middleIndex);
-  const rightLinks = data.links.slice(middleIndex);
+  // Symmetrical split logic
+  const leftLinks = data.links.slice(0, 1);
+  const rightLinks = data.links.slice(1, 2);
 
+  // Prevent hydration mismatch
   if (!mounted) return <nav className="h-20 bg-bone w-full fixed top-0 z-50" />;
 
   return (
-    <nav className="fixed top-0 w-full z-50 bg-bone/90 backdrop-blur-md border-b border-taupe/20">
+    <nav className="fixed top-0 w-full z-50 bg-bone/90 backdrop-blur-md border-b border-taupe/10">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between relative">
         
-        {/* Mobile Toggle */}
-        <button className="md:hidden text-espresso z-50" onClick={() => setIsOpen(!isOpen)}>
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+        {/* Mobile Toggle - Refined Stroke for Luxury Feel */}
+        <button 
+          className="md:hidden text-espresso z-50 p-2 focus:outline-none" 
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label="Toggle Menu"
+        >
+          <svg className="w-5 h-5 transition-transform duration-300" style={{ transform: isOpen ? 'rotate(90deg)' : 'none' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.2" d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 8h16M4 16h16"} />
           </svg>
         </button>
 
-        {/* Desktop Left Links */}
-        <div className="hidden md:flex gap-8">
-          {leftLinks.map((link) => (
-            <Link key={link.name} href={link.href} className="text-[11px] uppercase tracking-[0.2em] text-espresso hover:text-gold transition-colors">
+        {/* Desktop Left Link - Unique Key Implementation */}
+        <div className="hidden md:flex flex-1 justify-start">
+          {leftLinks.map((link, idx) => (
+            <Link 
+              key={`desktop-left-${link.name}-${idx}`} 
+              href={link.href} 
+              className="text-[10px] uppercase tracking-[0.4em] text-espresso hover:text-gold transition-all duration-500 font-medium"
+            >
               {link.name}
             </Link>
           ))}
         </div>
 
-        {/* Centered Dynamic Logo */}
-        <Link href="/" className="absolute left-1/2 -translate-x-1/2 text-center">
-          <h2 className="text-2xl font-serif italic text-espresso tracking-tighter">
+        {/* Centered Dynamic Logo - Refined Spacing */}
+        <Link href="/" className="absolute left-1/2 -translate-x-1/2 text-center group">
+          <h2 className="text-2xl font-serif italic text-espresso tracking-tighter transition-transform duration-700 group-hover:scale-105">
             {data.logoMain} 
-            <span className="font-sans not-italic font-light text-sm tracking-[0.3em] ml-2">
+            <span className="font-sans not-italic font-extralight text-[9px] tracking-[0.5em] ml-3 opacity-60 uppercase">
               {data.logoAccent}
             </span>
           </h2>
         </Link>
 
-        {/* Right Side Actions/Links */}
-        <div className="flex items-center">
-          <div className="hidden md:flex gap-8">
-            {rightLinks.map((link) => (
-              <Link key={link.name} href={link.href} className="text-[11px] uppercase tracking-[0.2em] text-espresso hover:text-gold transition-colors">
-                {link.name}
-              </Link>
-            ))}
-          </div>
+        {/* Desktop Right Link - Unique Key Implementation */}
+        <div className="hidden md:flex flex-1 justify-end">
+          {rightLinks.map((link, idx) => (
+            <Link 
+              key={`desktop-right-${link.name}-${idx}`} 
+              href={link.href} 
+              className="text-[10px] uppercase tracking-[0.4em] text-espresso hover:text-gold transition-all duration-500 font-medium"
+            >
+              {link.name}
+            </Link>
+          ))}
         </div>
       </div>
 
-      {/* Mobile Drawer Overlay */}
+      {/* Mobile Drawer Overlay - Smooth Animation and Unique Keys */}
       {isOpen && (
-        <div className="md:hidden bg-bone border-t border-taupe/10 px-6 py-8 space-y-6 flex flex-col items-center animate-in fade-in slide-in-from-top-4 duration-300">
-          {data.links.map((link) => (
-            <Link key={link.name} href={link.href} onClick={() => setIsOpen(false)} className="text-xs uppercase tracking-[0.2em] text-espresso">
+        <div className="md:hidden fixed inset-x-0 top-20 bg-bone border-b border-taupe/10 px-6 py-12 flex flex-col items-center space-y-10 animate-in fade-in slide-in-from-top-2 duration-500 ease-out">
+          {data.links.map((link, idx) => (
+            <Link 
+              key={`mobile-nav-${link.name}-${idx}`} 
+              href={link.href} 
+              onClick={() => setIsOpen(false)} 
+              className="text-[11px] uppercase tracking-[0.5em] text-espresso/80 hover:text-gold transition-colors duration-300"
+            >
               {link.name}
             </Link>
           ))}
