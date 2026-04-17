@@ -25,7 +25,7 @@ export const Footer = ({ data }: FooterProps) => {
   }, []);
 
   const footerData = data || {
-    brandName: "cura STUDIO",
+    brandName: "varda STUDIO",
     brandDescription: "Özel giysi arşivi ve modern silüetler.",
     column1Heading: "Mağaza",
     column2Heading: "Yardım",
@@ -33,7 +33,7 @@ export const Footer = ({ data }: FooterProps) => {
     newsletterText: "Yeni koleksiyonlardan ilk siz haberdar olun.",
     instagramUrl: "#",
     telegramUrl: "#",
-    copyrightText: "cura STUDIO. TÜM HAKLARI SAKLIDIR."
+    copyrightText: "varda STUDIO. TÜM HAKLARI SAKLIDIR."
   };
 
   // Prevent hydration flicker

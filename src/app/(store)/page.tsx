@@ -25,7 +25,7 @@ export default async function HomePage() {
     <main className="bg-[#0A0A0A] min-h-screen">
       <Hero data={heroConfig?.content} />
       
-      {/* Passing curated data to the themed component */}
+      {/* Passing vardated data to the themed component */}
       <ProductFeed initialProducts={products || []} />
     </main>
   );

@@ -52,7 +52,7 @@ export default function ProductDetailsClient({ product }: { product: any }) {
         .from('orders')
         .insert([{
           customer_name: formData.name || "Web Müşterisi",
-          customer_email: formData.email || "pending@cura.studio",
+          customer_email: formData.email || "pending@varda.studio",
           total_amount: product.price,
           status: 'completed',
           payment_method: 'Direct Inquiry',

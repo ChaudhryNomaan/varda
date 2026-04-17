@@ -20,7 +20,7 @@ export const Navbar = ({ adminData }: NavbarProps) => {
 
   // Updated defaults with Turkish categories
   const data = adminData || {
-    logoMain: "cura",
+    logoMain: "varda",
     logoAccent: "STUDIO",
     links: [
       { name: 'İndirim', href: '/collections/sale' },

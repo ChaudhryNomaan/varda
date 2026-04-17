@@ -53,7 +53,7 @@ export default function ShippingPage() {
   // Turkish Fallback Content
   const displayData = data || {
     title: "Sevkiyat ve Teslimat",
-    subtitle: "CURA Konseyerj Servisi",
+    subtitle: "varda Konseyerj Servisi",
     processingTime: "1-3 iş günü",
     moscowFreeThreshold: "5000",
     standardDeliveryCost: "250",
@@ -72,7 +72,7 @@ export default function ShippingPage() {
           </div>
           <p className="text-[14px] leading-relaxed text-espresso/70 font-light max-w-2xl">
             {displayData.courierText} <span className="text-gold font-medium italic serif underline decoration-gold/30 underline-offset-4">{displayData.processingTime}</span>. 
-            Her bir cura Studio parçası final kalite kontrolünden geçer ve el işçiliği ile paketlenir.
+            Her bir varda Studio parçası final kalite kontrolünden geçer ve el işçiliği ile paketlenir.
           </p>
         </section>
 
@@ -104,7 +104,7 @@ export default function ShippingPage() {
                 "{displayData.internationalText}"
               </p>
             </div>
-            <a href="https://t.me/curaStudio" target="_blank" className="text-[10px] uppercase tracking-[0.5em] text-gold border border-gold/30 px-10 py-5 hover:bg-gold hover:text-white transition-all duration-700">
+            <a href="https://t.me/vardaStudio" target="_blank" className="text-[10px] uppercase tracking-[0.5em] text-gold border border-gold/30 px-10 py-5 hover:bg-gold hover:text-white transition-all duration-700">
               Atölye ile İletişime Geç
             </a>
           </div>

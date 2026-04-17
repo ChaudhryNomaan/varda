@@ -51,7 +51,7 @@ export default function CategoryClient({
         
         {/* Header */}
         <div className="text-center space-y-4 mb-24">
-          <span className="text-[10px] uppercase tracking-[0.5em] text-taupe font-sans font-bold">cura Studio</span>
+          <span className="text-[10px] uppercase tracking-[0.5em] text-taupe font-sans font-bold">varda Studio</span>
           <h1 className="text-4xl md:text-6xl font-serif italic text-espresso tracking-tight">{config.title}</h1>
           <div className="h-px w-12 bg-gold/30 mx-auto mt-8" />
         </div>

@@ -53,12 +53,12 @@ export default function ReturnsPage() {
   // Turkish Fallback Content
   const displayData = data || {
     title: "İade ve Değişim",
-    subtitle: "CURA Kalite Güvencesi",
+    subtitle: "varda Kalite Güvencesi",
     conditionsText: "Ürünlerimizi teslim aldığınız tarihten itibaren 14 gün içinde, kullanılmamış ve orijinal etiketleri üzerinde olması kaydıyla iade edebilirsiniz.",
     exceptionsText: "Hijyen kuralları gereği iç giyim ve kişiselleştirilmiş ürünlerde iade kabul edilmemektedir.",
     defectPolicy: "Üretim kaynaklı bir kusur olması durumunda, tüm değişim ve kargo masrafları tarafımıza aittir.",
-    conciergeEmail: "concierge@cura.studio",
-    telegramHandle: "@curastudio"
+    conciergeEmail: "concierge@varda.studio",
+    telegramHandle: "@vardastudio"
   };
 
   return (

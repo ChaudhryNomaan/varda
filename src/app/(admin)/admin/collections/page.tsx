@@ -132,7 +132,7 @@ export default function AdminCollections() {
     <div className="max-w-7xl p-6 md:p-10 bg-[#0A0A0A] min-h-screen text-bone pb-40 mx-auto">
       <div className="mb-12 flex justify-between items-end">
         <div>
-          <span className="text-[10px] uppercase tracking-[0.5em] text-gold/60 font-bold">Curated Content</span>
+          <span className="text-[10px] uppercase tracking-[0.5em] text-gold/60 font-bold">vardated Content</span>
           <h1 className="text-4xl font-serif italic mt-2 text-gold">Showcase Management</h1>
         </div>
         

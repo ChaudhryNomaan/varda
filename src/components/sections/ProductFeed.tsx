@@ -28,7 +28,7 @@ export const ProductFeed = ({ initialProducts }: ProductFeedProps) => {
         {/* Header */}
         <div className="mb-16 border-l border-gold/30 pl-6">
           <span className="text-taupe tracking-[0.5em] uppercase text-[10px] font-bold block mb-2">
-            Curated Selection
+            vardated Selection
           </span>
           <h2 className="text-4xl md:text-6xl text-espresso font-serif italic tracking-tighter">
             Studio Essentials

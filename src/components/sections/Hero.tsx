@@ -22,7 +22,7 @@ export const Hero = ({ data }: HeroProps) => {
 
   const defaults = {
     subtitle: "Yeni Koleksiyon Şimdi Yayında",
-    titleMain: "cura",
+    titleMain: "varda",
     titleAccent: "STUDIO",
     buttonText: "Koleksiyonu İncele",
     videoUrl: "", // Öneri: Kumaş dokusunu gösteren yüksek kaliteli video

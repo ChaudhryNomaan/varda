@@ -127,7 +127,7 @@ export default function EditProductPage() {
 
   if (loading) return (
     <div className="p-32 text-center text-gold animate-pulse tracking-[0.6em] font-sans text-[10px] uppercase">
-      Accessing cura Archive...
+      Accessing varda Archive...
     </div>
   );
 

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '../../../../lib/supabase/client';
 
-// Refined for cura STUDIO product lines
+// Refined for varda STUDIO product lines
 const CATEGORY_MAP: Record<string, string[]> = {
   "t-shirts": ["All", "Oversized", "Signature", "Graphic", "Essential"],
   "outerwear": ["All", "Hoodies", "Jackets"],
@@ -39,7 +39,7 @@ export default function InventoryPage() {
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Permanently remove this garment from the cura archive?")) return;
+    if (!confirm("Permanently remove this garment from the varda archive?")) return;
     const { error } = await supabase.from('products').delete().eq('id', id);
     if (!error) {
       setProducts(prev => prev.filter(p => p.id !== id));
@@ -63,7 +63,7 @@ export default function InventoryPage() {
       {/* HEADER SECTION */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end border-b border-gold/10 pb-6 md:pb-8 gap-4">
         <div>
-          <span className="text-[9px] md:text-[10px] uppercase tracking-[0.5em] text-gold/60 font-sans font-bold">cura Studio</span>
+          <span className="text-[9px] md:text-[10px] uppercase tracking-[0.5em] text-gold/60 font-sans font-bold">varda Studio</span>
           <h1 className="text-2xl md:text-4xl font-serif italic text-bone mt-2">Inventory Management</h1>
           <p className="text-[8px] md:text-[9px] uppercase tracking-widest text-bone/30 mt-2 font-sans">
             Total Studio Assets: <span className="text-gold">{filteredProducts.length}</span>

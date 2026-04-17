@@ -8,7 +8,7 @@ export default function NavbarSettingsPage() {
   const [saving, setSaving] = useState(false);
   
   const [navbarData, setNavbarData] = useState({
-    logoMain: "cura",
+    logoMain: "varda",
     logoAccent: "STUDIO",
     links: [
       { name: 'Sale', href: '/collections/sale' },
@@ -63,7 +63,7 @@ export default function NavbarSettingsPage() {
     if (error) {
       alert("Error: " + error.message);
     } else {
-      alert("cura Navigation successfully synchronized.");
+      alert("varda Navigation successfully synchronized.");
     }
     setSaving(false);
   };

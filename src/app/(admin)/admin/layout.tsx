@@ -21,7 +21,7 @@ export default function AdminLayout({
               <div className="absolute inset-0 w-2 h-2 rounded-full bg-gold/50 animate-ping" />
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-[0.5em] text-white/60 font-bold">cura Studio</span>
+              <span className="text-[10px] uppercase tracking-[0.5em] text-white/60 font-bold">varda Studio</span>
               <span className="text-[7px] uppercase tracking-[0.3em] text-gold/40 -mt-0.5">Control Interface v2.1</span>
             </div>
           </div>
@@ -44,9 +44,9 @@ export default function AdminLayout({
           </div>
         </div>
 
-        {/* 5. Watermark Identity - Updated to cura */}
+        {/* 5. Watermark Identity - Updated to varda */}
         <div className="fixed bottom-12 right-12 pointer-events-none opacity-[0.03] select-none z-0">
-          <h2 className="text-[14vw] font-serif italic leading-none tracking-tighter">cura</h2>
+          <h2 className="text-[14vw] font-serif italic leading-none tracking-tighter">varda</h2>
         </div>
       </main>
     </div>
