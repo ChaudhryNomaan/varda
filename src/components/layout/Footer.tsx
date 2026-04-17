@@ -25,18 +25,17 @@ export const Footer = ({ data }: FooterProps) => {
   }, []);
 
   const footerData = data || {
-    brandName: "varda STUDIO",
-    brandDescription: "Özel giysi arşivi ve modern silüetler.",
-    column1Heading: "Mağaza",
-    column2Heading: "Yardım",
-    newsletterHeading: "Bülten",
-    newsletterText: "Yeni koleksiyonlardan ilk siz haberdar olun.",
+    brandName: "AETHER STUDIO",
+    brandDescription: "Exclusive garment archive and modern silhouettes.",
+    column1Heading: "Collections",
+    column2Heading: "Client Care",
+    newsletterHeading: "Newsletter",
+    newsletterText: "Be the first to discover new editorial drops.",
     instagramUrl: "#",
-    telegramUrl: "#",
-    copyrightText: "varda STUDIO. TÜM HAKLARI SAKLIDIR."
+    telegramUrl: "https://t.me/AetherConcierge",
+    copyrightText: "AETHER STUDIO. ALL RIGHTS RESERVED."
   };
 
-  // Prevent hydration flicker
   if (!mounted) return <footer className="bg-bone min-h-[400px]" />;
 
   return (
@@ -58,22 +57,22 @@ export const Footer = ({ data }: FooterProps) => {
           <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-espresso mb-2">
             {footerData.column1Heading}
           </h4>
-          <Link href="/collections/tshirts" className="text-[11px] text-espresso/80 hover:text-gold transition-colors uppercase tracking-widest">T-shirt</Link>
-          <Link href="/collections/sale" className="text-[11px] text-espresso/80 hover:text-gold transition-colors uppercase tracking-widest">İndirim</Link>
-          <Link href="/archive" className="text-[11px] text-espresso/80 hover:text-gold transition-colors uppercase tracking-widest opacity-40 cursor-not-allowed">Arşiv</Link>
+          <Link href="/collections/tshirts" className="text-[11px] text-espresso/80 hover:text-gold transition-colors uppercase tracking-widest">Essentials</Link>
+          <Link href="/collections/sale" className="text-[11px] text-espresso/80 hover:text-gold transition-colors uppercase tracking-widest">Archive Sale</Link>
+          <Link href="/archive" className="text-[11px] text-espresso/80 hover:text-gold transition-colors uppercase tracking-widest opacity-40 cursor-not-allowed">Past Seasons</Link>
         </div>
 
-        {/* Support Column */}
-        <div className="flex flex-col space-y-3">
+        {/* Support Column - Updated Labels */}
+        {/* <div className="flex flex-col space-y-3">
           <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-espresso mb-2">
             {footerData.column2Heading}
           </h4>
-          <Link href="/shipping" className="text-[11px] text-espresso/80 hover:text-gold transition-colors uppercase tracking-widest">Teslimat</Link>
+          <Link href="/shipping" className="text-[11px] text-espresso/80 hover:text-gold transition-colors uppercase tracking-widest">Shipping & Delivery</Link>
           <Link href="/size-guide" className="text-[11px] text-espresso/80 hover:text-gold transition-colors uppercase tracking-widest">
-            Beden Rehberi
+            Sizing Guide
           </Link>
-          <Link href="/returns" className="text-[11px] text-espresso/80 hover:text-gold transition-colors uppercase tracking-widest">İade</Link>
-        </div>
+          <Link href="/returns" className="text-[11px] text-espresso/80 hover:text-gold transition-colors uppercase tracking-widest">Returns & Exchanges</Link>
+        </div> */}
 
         {/* Newsletter Column */}
         <div className="space-y-4">
@@ -86,10 +85,10 @@ export const Footer = ({ data }: FooterProps) => {
           <div className="flex border-b border-espresso/30 pb-1 group focus-within:border-gold transition-colors">
             <input 
               type="email" 
-              placeholder="E-POSTA" 
+              placeholder="EMAIL ADDRESS" 
               className="bg-transparent border-none text-[10px] tracking-[0.2em] focus:outline-none w-full placeholder:text-espresso/40 text-espresso"
             />
-            <button className="text-[10px] uppercase tracking-[0.2em] text-espresso hover:text-gold transition-colors">Tamam</button>
+            <button className="text-[10px] uppercase tracking-[0.2em] text-espresso hover:text-gold transition-colors">Join</button>
           </div>
         </div>
       </div>
